@@ -12,7 +12,7 @@ import { authenticate } from '../middlewares/auth.middleware';
 
 const router = express.Router();
 
-router.post('/register', register);
+router.post('/signup', register);
 router.post('/login', login);
 router.get('/me', authenticate(allAST), getCurrentUser);
 router.post('/change-password', changePassword);

@@ -22,7 +22,6 @@ const userSchema = new mongoose.Schema(
         },
         phone: {
             type: Number,
-            max: 15
         },
         role: {
             type: String,

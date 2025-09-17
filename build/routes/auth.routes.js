@@ -8,7 +8,7 @@ const auth_controller_1 = require("../controllers/auth.controller");
 const global_types_1 = require("../types/global.types");
 const auth_middleware_1 = require("../middlewares/auth.middleware");
 const router = express_1.default.Router();
-router.post('/register', auth_controller_1.register);
+router.post('/signup', auth_controller_1.register);
 router.post('/login', auth_controller_1.login);
 router.get('/me', (0, auth_middleware_1.authenticate)(global_types_1.allAST), auth_controller_1.getCurrentUser);
 router.post('/change-password', auth_controller_1.changePassword);
