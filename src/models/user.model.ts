@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { Gender, Role } from '../types/enum.types';
+import { Role } from '../types/enum.types';
 
 
 const userSchema = new mongoose.Schema(
@@ -22,12 +22,7 @@ const userSchema = new mongoose.Schema(
         },
         phone: {
             type: Number,
-            required: true
-        },
-        gender: {
-            type: String,
-            enum: Object.values(Gender),
-            required: true
+            max: 15
         },
         role: {
             type: String,

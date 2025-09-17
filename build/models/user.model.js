@@ -24,12 +24,7 @@ const userSchema = new mongoose_1.default.Schema({
     },
     phone: {
         type: Number,
-        required: true
-    },
-    gender: {
-        type: String,
-        enum: Object.values(enum_types_1.Gender),
-        required: true
+        max: 15
     },
     role: {
         type: String,
