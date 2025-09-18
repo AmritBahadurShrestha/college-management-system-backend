@@ -52,6 +52,7 @@ const teacher_routes_1 = __importDefault(require("./routes/teacher.routes"));
 const course_routes_1 = __importDefault(require("./routes/course.routes"));
 const class_routes_1 = __importDefault(require("./routes/class.routes"));
 const attendance_routes_1 = __importDefault(require("./routes/attendance.routes"));
+const dashboard_routes_1 = __importDefault(require("./routes/dashboard.routes"));
 const PORT = process.env.PORT;
 const DATABASE_URI = (_a = process.env.DATABASE_URI) !== null && _a !== void 0 ? _a : '';
 const app = (0, express_1.default)();
@@ -82,6 +83,7 @@ app.use('/api/teacher', teacher_routes_1.default);
 app.use('/api/course', course_routes_1.default);
 app.use('/api/class', class_routes_1.default);
 app.use('/api/attendance', attendance_routes_1.default);
+app.use('/api/dashboard', dashboard_routes_1.default);
 // Custom Error
 app.all('/{*all}', (req, res, next) => {
     const message = `Cannot ${req.method} on ${req.originalUrl}`;

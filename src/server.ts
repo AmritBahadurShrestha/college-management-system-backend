@@ -14,6 +14,7 @@ import teacherRoutes from './routes/teacher.routes';
 import courseRoutes from './routes/course.routes';
 import classRoutes from './routes/class.routes';
 import attendanceRoutes from './routes/attendance.routes';
+import dashboardRoutes from './routes/dashboard.routes';
 
 
 const PORT = process.env.PORT;
@@ -53,6 +54,7 @@ app.use('/api/teacher', teacherRoutes);
 app.use('/api/course', courseRoutes);
 app.use('/api/class', classRoutes);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Custom Error
 app.all('/{*all}', (req: Request, res: Response, next: NextFunction) => {
