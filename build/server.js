@@ -56,18 +56,27 @@ const dashboard_routes_1 = __importDefault(require("./routes/dashboard.routes"))
 const PORT = process.env.PORT;
 const DATABASE_URI = (_a = process.env.DATABASE_URI) !== null && _a !== void 0 ? _a : '';
 const app = (0, express_1.default)();
+const allowed_origins = [
+    process.env.FRONT_END_LOCAL_URL,
+    process.env.FRONT_END_LIVE_URL
+];
 // Connect DataBase
 (0, database_config_1.connectDatabase)(DATABASE_URI);
 // Use Middlewares
 app.use((0, cors_1.default)({
-    origin: process.env.FRONT_END_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+        if (allowed_origins.includes(origin)) {
+            callback(null, true);
+        }
+        callback(new error_handler_middleware_1.default('Blocked by Cors error', 422));
+    },
     credentials: true
 }));
 app.use((0, helmet_1.default)());
-app.use(express_1.default.json({ limit: '5mb' }));
-app.use(express_1.default.urlencoded({ limit: '5mb', extended: true }));
 // Use Cookie Parser
 app.use((0, cookie_parser_1.default)());
+app.use(express_1.default.json({ limit: '5mb' }));
+app.use(express_1.default.urlencoded({ limit: '5mb', extended: true }));
 // Server Uploads
 app.use('/api/uploads', express_1.default.static('uploads/'));
 app.get('/', (req, res) => {
@@ -85,7 +94,7 @@ app.use('/api/class', class_routes_1.default);
 app.use('/api/attendance', attendance_routes_1.default);
 app.use('/api/dashboard', dashboard_routes_1.default);
 // Custom Error
-app.all('/{*all}', (req, res, next) => {
+app.use((req, res, next) => {
     const message = `Cannot ${req.method} on ${req.originalUrl}`;
     const err = new error_handler_middleware_1.default(message, 404);
     next(err);

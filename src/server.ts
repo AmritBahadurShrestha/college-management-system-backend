@@ -22,20 +22,31 @@ const DATABASE_URI = process.env.DATABASE_URI ?? '';
 
 const app = express();
 
+const allowed_origins = [
+    process.env.FRONT_END_LOCAL_URL,
+    process.env.FRONT_END_LIVE_URL
+]
+
 // Connect DataBase
 connectDatabase(DATABASE_URI);
 
 // Use Middlewares
 app.use(cors({
-    origin: process.env.FRONT_END_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+        if (allowed_origins.includes(origin)) {
+            callback(null, true)
+        }
+        callback(new CustomError('Blocked by Cors error', 422))
+    },
     credentials: true
 }));
 app.use(helmet());
-app.use(express.json({limit: '5mb'}));
-app.use(express.urlencoded({limit: '5mb', extended: true}));
 
 // Use Cookie Parser
 app.use(cookieParser());
+app.use(express.json({limit: '5mb'}));
+app.use(express.urlencoded({limit: '5mb', extended: true}));
+
 
 // Server Uploads
 app.use('/api/uploads', express.static('uploads/'));
@@ -57,7 +68,7 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
 // Custom Error
-app.all('/{*all}', (req: Request, res: Response, next: NextFunction) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
     const message = `Cannot ${req.method} on ${req.originalUrl}`;
     const err: any = new CustomError(message, 404);
     next(err);
