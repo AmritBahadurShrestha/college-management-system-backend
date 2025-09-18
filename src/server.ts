@@ -35,8 +35,10 @@ app.use(cors({
     origin: (origin, callback) => {
         if (allowed_origins.includes(origin)) {
             callback(null, true)
+        } else {
+            callback(new CustomError('Blocked by Cors error', 422))
         }
-        callback(new CustomError('Blocked by Cors error', 422))
+        
     },
     credentials: true
 }));

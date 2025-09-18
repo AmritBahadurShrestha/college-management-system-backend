@@ -68,7 +68,9 @@ app.use((0, cors_1.default)({
         if (allowed_origins.includes(origin)) {
             callback(null, true);
         }
-        callback(new error_handler_middleware_1.default('Blocked by Cors error', 422));
+        else {
+            callback(new error_handler_middleware_1.default('Blocked by Cors error', 422));
+        }
     },
     credentials: true
 }));
