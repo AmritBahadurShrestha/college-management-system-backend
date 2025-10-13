@@ -1,4 +1,5 @@
 import Student from '../models/student.model';
+import { getPagination } from '../utils/pagination.utils';
 import { Request, Response, NextFunction } from 'express';
 import { asyncHandler } from '../utils/async-handler.utils';
 import CustomError from '../middlewares/error-handler.middleware';
@@ -60,12 +61,23 @@ export const createStudent = asyncHandler(
 export const getAllStudents = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
 
-        const students = await Student.find().populate('courses').sort({ createdAt: -1});
+        const { current_page, per_page } = req.query;
+
+        const page = Number(current_page) || 1;
+        const limit = Number(per_page) || 2;
+        const skip = (page - 1) * limit;
+
+        // Total number of students
+        const total = await Student.countDocuments();
+
+        // Fetch students with pagination
+        const students = await Student.find().populate('courses').sort({ createdAt: -1}).limit(limit).skip(skip);
 
         res.status(200).json({
             status: 'success',
             success: true,
             data: students,
+            pagination: getPagination(total, page, limit),
             message: 'All students fetched successfully'
         });
     }
