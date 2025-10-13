@@ -57,7 +57,7 @@ exports.createStudent = (0, async_handler_utils_1.asyncHandler)((req, res, next)
 exports.getAllStudents = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { current_page, per_page } = req.query;
     const page = Number(current_page) || 1;
-    const limit = Number(per_page) || 2;
+    const limit = Number(per_page) || 5;
     const skip = (page - 1) * limit;
     // Total number of students
     const total = yield student_model_1.default.countDocuments();

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteTeacher = exports.updateTeacher = exports.getTeacherById = exports.getAllTeachers = exports.createTeacher = void 0;
 const teacher_model_1 = __importDefault(require("../models/teacher.model"));
+const pagination_utils_1 = require("../utils/pagination.utils");
 const async_handler_utils_1 = require("../utils/async-handler.utils");
 const error_handler_middleware_1 = __importDefault(require("../middlewares/error-handler.middleware"));
 const cloudinary_service_utils_1 = require("../utils/cloudinary-service.utils");
@@ -45,11 +46,19 @@ exports.createTeacher = (0, async_handler_utils_1.asyncHandler)((req, res, next)
 }));
 // Get All Teachers
 exports.getAllTeachers = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const teachers = yield teacher_model_1.default.find().populate('courses').sort({ createdAt: -1 });
+    const { current_page, per_page } = req.query;
+    const page = Number(current_page) || 1;
+    const limit = Number(per_page) || 5;
+    const skip = (page - 1) * limit;
+    // Total number of teachers
+    const total = yield teacher_model_1.default.countDocuments();
+    // Fetch teachers with pagination
+    const teachers = yield teacher_model_1.default.find().populate('courses').sort({ createdAt: -1 }).limit(limit).skip(skip);
     res.status(200).json({
         status: 'success',
         success: true,
         data: teachers,
+        pagination: (0, pagination_utils_1.getPagination)(total, page, limit),
         message: 'All teachers fetched successfully'
     });
 }));

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAttendanceByClassId = exports.getAttendanceByCourseId = exports.getAttendanceByStudentId = exports.deleteAttendance = exports.updateAttendance = exports.getAttendanceById = exports.getAllAttendance = exports.createAttendance = void 0;
 const attendance_model_1 = __importDefault(require("../models/attendance.model"));
+const pagination_utils_1 = require("../utils/pagination.utils");
 const async_handler_utils_1 = require("../utils/async-handler.utils");
 const error_handler_middleware_1 = __importDefault(require("../middlewares/error-handler.middleware"));
 // Mark Attendance
@@ -29,11 +30,19 @@ exports.createAttendance = (0, async_handler_utils_1.asyncHandler)((req, res, ne
 }));
 // Get All Attendance Records
 exports.getAllAttendance = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const records = yield attendance_model_1.default.find().populate('student class course').sort({ createdAt: -1 });
+    const { current_page, per_page } = req.query;
+    const page = Number(current_page) || 1;
+    const limit = Number(per_page) || 5;
+    const skip = (page - 1) * limit;
+    // Total number of records
+    const total = yield attendance_model_1.default.countDocuments();
+    // Fetch records with pagination
+    const records = yield attendance_model_1.default.find().populate('student class course').sort({ createdAt: -1 }).limit(limit).skip(skip);
     res.status(200).json({
         status: 'success',
         success: true,
         data: records,
+        pagination: (0, pagination_utils_1.getPagination)(total, page, limit),
         message: 'All attendance records fetched successfully'
     });
 }));

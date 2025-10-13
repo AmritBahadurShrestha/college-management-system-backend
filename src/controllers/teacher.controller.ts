@@ -1,5 +1,6 @@
 import Teacher from '../models/teacher.model';
 import { Request, Response, NextFunction } from 'express';
+import { getPagination } from '../utils/pagination.utils';
 import { asyncHandler } from '../utils/async-handler.utils';
 import CustomError from '../middlewares/error-handler.middleware';
 import { uploadFile, deleteFiles } from '../utils/cloudinary-service.utils';
@@ -48,12 +49,23 @@ export const createTeacher = asyncHandler(
 export const getAllTeachers = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
 
-        const teachers = await Teacher.find().populate('courses').sort({ createdAt: -1});
+        const { current_page, per_page } = req.query;
+
+        const page = Number(current_page) || 1;
+        const limit = Number(per_page) || 5;
+        const skip = (page - 1) * limit;
+
+        // Total number of teachers
+        const total = await Teacher.countDocuments();
+
+        // Fetch teachers with pagination
+        const teachers = await Teacher.find().populate('courses').sort({ createdAt: -1}).limit(limit).skip(skip);
 
         res.status(200).json({
             status: 'success',
             success: true,
             data: teachers,
+            pagination: getPagination(total, page, limit),
             message: 'All teachers fetched successfully'
         });
     }

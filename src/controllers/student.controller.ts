@@ -64,7 +64,7 @@ export const getAllStudents = asyncHandler(
         const { current_page, per_page } = req.query;
 
         const page = Number(current_page) || 1;
-        const limit = Number(per_page) || 2;
+        const limit = Number(per_page) || 5;
         const skip = (page - 1) * limit;
 
         // Total number of students
