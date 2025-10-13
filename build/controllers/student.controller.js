@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteStudent = exports.updateStudent = exports.getStudentById = exports.getAllStudents = exports.createStudent = void 0;
+exports.deleteStudent = exports.updateStudent = exports.getStudentById = exports.getAllStudentsList = exports.getAllStudents = exports.createStudent = void 0;
 const student_model_1 = __importDefault(require("../models/student.model"));
 const pagination_utils_1 = require("../utils/pagination.utils");
 const async_handler_utils_1 = require("../utils/async-handler.utils");
@@ -69,6 +69,16 @@ exports.getAllStudents = (0, async_handler_utils_1.asyncHandler)((req, res, next
         data: students,
         pagination: (0, pagination_utils_1.getPagination)(total, page, limit),
         message: 'All students fetched successfully'
+    });
+}));
+// Get All Students List Used In All Frontend Forms
+exports.getAllStudentsList = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const students = yield student_model_1.default.find().sort({ fullName: 1 });
+    res.status(200).json({
+        status: 'success',
+        success: true,
+        data: students,
+        message: 'All students List fetched successfully'
     });
 }));
 // Get Student By ID

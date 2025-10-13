@@ -83,6 +83,21 @@ export const getAllStudents = asyncHandler(
     }
 );
 
+// Get All Students List Used In All Frontend Forms
+export const getAllStudentsList = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+
+        const students = await Student.find().sort({ fullName: 1 });
+
+        res.status(200).json({
+            status: 'success',
+            success: true,
+            data: students,
+            message: 'All students List fetched successfully'
+        });
+    }
+);
+
 // Get Student By ID
 export const getStudentById = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
