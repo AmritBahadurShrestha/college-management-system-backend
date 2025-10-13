@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 
-
 class CustomError extends Error {
     statusCode: number;
     status: 'error' | 'fail';

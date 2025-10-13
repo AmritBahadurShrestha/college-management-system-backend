@@ -3,7 +3,6 @@ import { Request, Response, NextFunction } from 'express';
 import { asyncHandler } from '../utils/async-handler.utils';
 import CustomError from '../middlewares/error-handler.middleware';
 
-
 // Get All Users
 export const getAllUsers = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {

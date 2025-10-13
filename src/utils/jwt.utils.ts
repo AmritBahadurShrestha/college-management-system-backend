@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { IJWTPayload, IJWTDecoderPayload } from '../types/global.types';
 
-
 const JWT_SECRET = process.env.JWT_SECRET ?? '';
 const JWT_EXPIRE_IN = process.env.JWT_EXPIRE_IN;
 

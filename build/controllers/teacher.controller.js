@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteTeacher = exports.updateTeacher = exports.getTeacherById = exports.getAllTeachers = exports.createTeacher = void 0;
+exports.deleteTeacher = exports.updateTeacher = exports.getTeacherById = exports.getAllTeachersList = exports.getAllTeachers = exports.createTeacher = void 0;
 const teacher_model_1 = __importDefault(require("../models/teacher.model"));
 const pagination_utils_1 = require("../utils/pagination.utils");
 const async_handler_utils_1 = require("../utils/async-handler.utils");
@@ -60,6 +60,16 @@ exports.getAllTeachers = (0, async_handler_utils_1.asyncHandler)((req, res, next
         data: teachers,
         pagination: (0, pagination_utils_1.getPagination)(total, page, limit),
         message: 'All teachers fetched successfully'
+    });
+}));
+// Get All Teachers List Used In All Forms
+exports.getAllTeachersList = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const teachers = yield teacher_model_1.default.find().sort({ fullName: 1 });
+    res.status(200).json({
+        status: 'success',
+        success: true,
+        data: teachers,
+        message: 'All teachers list fetched successfully'
     });
 }));
 // Get Teacher By ID

@@ -11,7 +11,6 @@ import { onlyAdmin } from '../types/global.types';
 import { authenticate } from '../middlewares/auth.middleware';
 import { uploader } from '../middlewares/uploader.middleware';
 
-
 const router = express.Router();
 
 const upload = uploader();

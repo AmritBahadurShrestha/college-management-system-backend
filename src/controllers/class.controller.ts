@@ -4,7 +4,6 @@ import { getPagination } from '../utils/pagination.utils';
 import { asyncHandler } from '../utils/async-handler.utils';
 import CustomError from '../middlewares/error-handler.middleware';
 
-
 // Create Class
 export const createClass = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -35,7 +34,7 @@ export const getAllClasses = asyncHandler(
         const total = await Class.countDocuments();
 
         // Fetch classes with pagination
-        const Classes = await Class.find().populate('students courses teacher').sort({ createdAt: -1}).limit(limit).skip(skip);
+        const Classes = await Class.find().populate('students courses teacher').sort({ createdAt: -1 }).limit(limit).skip(skip);
 
         res.status(200).json({
             status: 'success',
@@ -43,6 +42,21 @@ export const getAllClasses = asyncHandler(
             data: Classes,
             pagination: getPagination(total, page, limit),
             message: 'All classes fetched successfully'
+        });
+    }
+);
+
+// Get All Classes List Used In All Forms
+export const getAllClassesList = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+
+        const Classes = await Class.find().populate('students courses teacher').sort({ name: 1 });
+
+        res.status(200).json({
+            status: 'success',
+            success: true,
+            data: Classes,
+            message: 'All classes list fetched successfully'
         });
     }
 );

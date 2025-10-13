@@ -16,7 +16,6 @@ import classRoutes from './routes/class.routes';
 import attendanceRoutes from './routes/attendance.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 
-
 const PORT = process.env.PORT;
 const DATABASE_URI = process.env.DATABASE_URI ?? '';
 
@@ -48,7 +47,6 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(express.json({limit: '5mb'}));
 app.use(express.urlencoded({limit: '5mb', extended: true}));
-
 
 // Server Uploads
 app.use('/api/uploads', express.static('uploads/'));

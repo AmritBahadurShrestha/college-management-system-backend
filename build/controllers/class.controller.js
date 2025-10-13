@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteClass = exports.updateClass = exports.getClassById = exports.getAllClasses = exports.createClass = void 0;
+exports.deleteClass = exports.updateClass = exports.getClassById = exports.getAllClassesList = exports.getAllClasses = exports.createClass = void 0;
 const class_model_1 = __importDefault(require("../models/class.model"));
 const pagination_utils_1 = require("../utils/pagination.utils");
 const async_handler_utils_1 = require("../utils/async-handler.utils");
@@ -44,6 +44,16 @@ exports.getAllClasses = (0, async_handler_utils_1.asyncHandler)((req, res, next)
         data: Classes,
         pagination: (0, pagination_utils_1.getPagination)(total, page, limit),
         message: 'All classes fetched successfully'
+    });
+}));
+// Get All Classes List Used In All Forms
+exports.getAllClassesList = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const Classes = yield class_model_1.default.find().populate('students courses teacher').sort({ name: 1 });
+    res.status(200).json({
+        status: 'success',
+        success: true,
+        data: Classes,
+        message: 'All classes list fetched successfully'
     });
 }));
 // Get Class By ID

@@ -10,6 +10,7 @@ const auth_middleware_1 = require("../middlewares/auth.middleware");
 const router = express_1.default.Router();
 router.post('/', (0, auth_middleware_1.authenticate)(global_types_1.onlyAdmin), course_controller_1.createCourse);
 router.get('/', course_controller_1.getAllCourses);
+router.get('/all', course_controller_1.getAllCoursesList);
 router.get('/:id', course_controller_1.getCourseById);
 router.put('/:id', (0, auth_middleware_1.authenticate)(global_types_1.onlyAdmin), course_controller_1.updateCourse);
 router.delete('/:id', (0, auth_middleware_1.authenticate)(global_types_1.onlyAdmin), course_controller_1.deleteCourse);

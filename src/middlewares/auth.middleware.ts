@@ -4,7 +4,6 @@ import { Role } from '../types/enum.types';
 import CustomError from './error-handler.middleware';
 import User from '../models/user.model';
 
-
 export const authenticate = (roles?: Role[]) => {
     return async(req: Request, res: Response, next: NextFunction) => {
         try {

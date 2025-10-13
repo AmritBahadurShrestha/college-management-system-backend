@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import { Role } from '../types/enum.types';
 
-
 const userSchema = new mongoose.Schema(
     {
         fullName: {

@@ -7,7 +7,6 @@ import { uploadFile, deleteFiles } from '../utils/cloudinary-service.utils';
 // import { sendEmail } from '../utils/nodemailer.utils';
 // import { generate_student_account_email } from '../utils/email.utils';
 
-
 // Register Student Profile
 const folder_name = '/students';
 
@@ -71,7 +70,7 @@ export const getAllStudents = asyncHandler(
         const total = await Student.countDocuments();
 
         // Fetch students with pagination
-        const students = await Student.find().populate('courses').sort({ createdAt: -1}).limit(limit).skip(skip);
+        const students = await Student.find().populate('courses').sort({ createdAt: -1 }).limit(limit).skip(skip);
 
         res.status(200).json({
             status: 'success',
@@ -83,7 +82,7 @@ export const getAllStudents = asyncHandler(
     }
 );
 
-// Get All Students List Used In All Frontend Forms
+// Get All Students List Used In All Forms
 export const getAllStudentsList = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
 
@@ -93,7 +92,7 @@ export const getAllStudentsList = asyncHandler(
             status: 'success',
             success: true,
             data: students,
-            message: 'All students List fetched successfully'
+            message: 'All students list fetched successfully'
         });
     }
 );

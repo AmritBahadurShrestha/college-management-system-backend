@@ -10,6 +10,7 @@ const auth_middleware_1 = require("../middlewares/auth.middleware");
 const router = express_1.default.Router();
 router.post('/', (0, auth_middleware_1.authenticate)(global_types_1.allAdminsTeachers), class_controller_1.createClass);
 router.get('/', class_controller_1.getAllClasses);
+router.get('/all', class_controller_1.getAllClassesList);
 router.get('/:id', class_controller_1.getClassById);
 router.put('/:id', (0, auth_middleware_1.authenticate)(global_types_1.allAdminsTeachers), class_controller_1.updateClass);
 router.delete('/:id', (0, auth_middleware_1.authenticate)(global_types_1.allAdminsTeachers), class_controller_1.deleteClass);

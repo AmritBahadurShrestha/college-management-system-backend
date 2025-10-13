@@ -6,7 +6,6 @@ import { hashPassword, compareHash } from '../utils/bcrypt.utils';
 import { IJWTPayload } from '../types/global.types';
 import { generateToken } from '../utils/jwt.utils';
 
-
 // Register User
 export const register = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {

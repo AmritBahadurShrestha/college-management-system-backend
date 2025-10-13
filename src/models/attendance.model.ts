@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import { AttendanceStatus } from '../types/enum.types';
 
-
 const attendanceSchema = new mongoose.Schema(
     {
         student: {

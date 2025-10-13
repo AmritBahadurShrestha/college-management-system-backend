@@ -4,7 +4,6 @@ import { getPagination } from '../utils/pagination.utils';
 import { asyncHandler } from '../utils/async-handler.utils';
 import CustomError from '../middlewares/error-handler.middleware';
 
-
 // Mark Attendance
 export const createAttendance = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -35,7 +34,7 @@ export const getAllAttendance = asyncHandler(
         const total = await Attendance.countDocuments();
 
         // Fetch records with pagination
-        const records = await Attendance.find().populate('student class course').sort({ createdAt: -1}).limit(limit).skip(skip);
+        const records = await Attendance.find().populate('student class course').sort({ createdAt: -1 }).limit(limit).skip(skip);
 
         res.status(200).json({
             status: 'success',

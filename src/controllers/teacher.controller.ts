@@ -5,7 +5,6 @@ import { asyncHandler } from '../utils/async-handler.utils';
 import CustomError from '../middlewares/error-handler.middleware';
 import { uploadFile, deleteFiles } from '../utils/cloudinary-service.utils';
 
-
 // Register Teacher Profile
 const folder_name = '/teachers';
 
@@ -59,7 +58,7 @@ export const getAllTeachers = asyncHandler(
         const total = await Teacher.countDocuments();
 
         // Fetch teachers with pagination
-        const teachers = await Teacher.find().populate('courses').sort({ createdAt: -1}).limit(limit).skip(skip);
+        const teachers = await Teacher.find().populate('courses').sort({ createdAt: -1 }).limit(limit).skip(skip);
 
         res.status(200).json({
             status: 'success',
@@ -67,6 +66,21 @@ export const getAllTeachers = asyncHandler(
             data: teachers,
             pagination: getPagination(total, page, limit),
             message: 'All teachers fetched successfully'
+        });
+    }
+);
+
+// Get All Teachers List Used In All Forms
+export const getAllTeachersList = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+
+        const teachers = await Teacher.find().sort({ fullName: 1 });
+
+        res.status(200).json({
+            status: 'success',
+            success: true,
+            data: teachers,
+            message: 'All teachers list fetched successfully'
         });
     }
 );

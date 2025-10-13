@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import { Gender } from '../types/enum.types';
 
-
 const studentSchema = new mongoose.Schema(
     {
         fullName: {

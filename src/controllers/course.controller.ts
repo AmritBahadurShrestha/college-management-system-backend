@@ -4,7 +4,6 @@ import { getPagination } from '../utils/pagination.utils';
 import { asyncHandler } from '../utils/async-handler.utils';
 import CustomError from '../middlewares/error-handler.middleware';
 
-
 // Create Course
 export const createCourse = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -35,7 +34,7 @@ export const getAllCourses = asyncHandler(
         const total = await Course.countDocuments();
 
         // Fetch courses with pagination
-        const courses = await Course.find().sort({ createdAt: -1}).limit(limit).skip(skip);
+        const courses = await Course.find().sort({ createdAt: -1 }).limit(limit).skip(skip);
 
         res.status(200).json({
             status: 'success',
@@ -43,6 +42,21 @@ export const getAllCourses = asyncHandler(
             data: courses,
             pagination: getPagination(total, page, limit),
             message: 'All courses fetched successfully'
+        });
+    }
+);
+
+// Get All Courses List Used In All Forms
+export const getAllCoursesList = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+
+        const courses = await Course.find().sort({ name: 1 });
+
+        res.status(200).json({
+            status: 'success',
+            success: true,
+            data: courses,
+            message: 'All courses list fetched successfully'
         });
     }
 );

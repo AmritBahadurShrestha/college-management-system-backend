@@ -12,7 +12,6 @@ import {
 import { allAdminsTeachers } from '../types/global.types';
 import { authenticate } from '../middlewares/auth.middleware';
 
-
 const router = express.Router();
 
 router.post('/', authenticate(allAdminsTeachers), createAttendance);

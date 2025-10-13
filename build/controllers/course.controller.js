@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCourse = exports.updateCourse = exports.getCourseById = exports.getAllCourses = exports.createCourse = void 0;
+exports.deleteCourse = exports.updateCourse = exports.getCourseById = exports.getAllCoursesList = exports.getAllCourses = exports.createCourse = void 0;
 const course_model_1 = __importDefault(require("../models/course.model"));
 const pagination_utils_1 = require("../utils/pagination.utils");
 const async_handler_utils_1 = require("../utils/async-handler.utils");
@@ -44,6 +44,16 @@ exports.getAllCourses = (0, async_handler_utils_1.asyncHandler)((req, res, next)
         data: courses,
         pagination: (0, pagination_utils_1.getPagination)(total, page, limit),
         message: 'All courses fetched successfully'
+    });
+}));
+// Get All Courses List Used In All Forms
+exports.getAllCoursesList = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const courses = yield course_model_1.default.find().sort({ name: 1 });
+    res.status(200).json({
+        status: 'success',
+        success: true,
+        data: courses,
+        message: 'All courses list fetched successfully'
     });
 }));
 // Get Course By ID

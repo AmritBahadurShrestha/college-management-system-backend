@@ -9,7 +9,6 @@ import {
 import { allAST } from '../types/global.types';
 import { authenticate } from '../middlewares/auth.middleware';
 
-
 const router = express.Router();
 
 router.post('/signup', register);
