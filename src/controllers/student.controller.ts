@@ -61,17 +61,33 @@ export const getAllStudents = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
 
         const { current_page, per_page } = req.query;
+        const {query} = req.body
+
+        console.log(query)
 
         const page = Number(current_page) || 1;
         const limit = Number(per_page) || 5;
         const skip = (page - 1) * limit;
 
+        let filter:any={}
+
+
+      if (query) {
+    filter.$or = [
+        {
+            fullName: { $regex: query, $options: "i" }
+        }
+    ];
+}
+
         // Total number of students
         const total = await Student.countDocuments();
 
         // Fetch students with pagination
-        const students = await Student.find().populate('courses').sort({ createdAt: -1 }).limit(limit).skip(skip);
+        const students = await Student.find(filter).populate('courses').sort({ createdAt: -1 }).limit(limit).skip(skip);
 
+
+        console.log(students)
         res.status(200).json({
             status: 'success',
             success: true,

@@ -30,11 +30,22 @@ export const getAllAttendance = asyncHandler(
         const limit = Number(per_page) || 5;
         const skip = (page - 1) * limit;
 
+        // let filter:any ={}
+
+        // if(query){
+        //     filter.$or=[
+        //         {
+        //           name: query,
+        //           option: "i" 
+        //         }
+        //     ]
+        // }
+        
         // Total number of records
         const total = await Attendance.countDocuments();
 
         // Fetch records with pagination
-        const records = await Attendance.find().populate('student class course').sort({ createdAt: -1 }).limit(limit).skip(skip);
+        const records = await Attendance.find({}).populate('student class course').sort({ createdAt: -1 }).limit(limit).skip(skip);
 
         res.status(200).json({
             status: 'success',
