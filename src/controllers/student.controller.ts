@@ -57,46 +57,48 @@ export const createStudent = asyncHandler(
 );
 
 // Get All Students
-export const getAllStudents = asyncHandler(
-    async (req: Request, res: Response, next: NextFunction) => {
+    export const getAllStudents = asyncHandler(
+        async (req: Request, res: Response, next: NextFunction) => {
 
-        const { current_page, per_page } = req.query;
-        const {query} = req.body
+            const { current_page, per_page } = req.query;
+            const {query} = req.body
 
-      
+        
 
-        const page = Number(current_page) || 1;
-        const limit = Number(per_page) || 5;
-        const skip = (page - 1) * limit;
+            const page = Number(current_page) || 1;
+            const limit = Number(per_page) || 5;
+            const skip = (page - 1) * limit;
 
-        let filter:any={}
+           const searchQuery = typeof query ==="string"? query:""
 
-
-      if (query) {
-    filter.$or = [
-        {
-            fullName: { $regex: query, $options: "i" }
-        }
-    ];
-}
-
-        // Total number of students
-        const total = await Student.countDocuments();
-
-        // Fetch students with pagination
-        const students = await Student.find(filter).populate('courses').sort({ createdAt: -1 }).limit(limit).skip(skip);
+            let filter:any={}
 
 
-        console.log(students)
-        res.status(200).json({
-            status: 'success',
-            success: true,
-            data: students,
-            pagination: getPagination(total, page, limit),
-            message: 'All students fetched successfully'
-        });
+        if (searchQuery) {
+        filter.$or = [
+            {
+                fullName: { $regex: searchQuery, $options: "i" }
+            }
+        ];
     }
-);
+
+            // Total number of students
+            const total = await Student.countDocuments(filter);
+
+            // Fetch students with pagination
+            const students = await Student.find(filter).populate('courses').sort({ createdAt: -1 }).limit(limit).skip(skip);
+
+
+            console.log(students)
+            res.status(200).json({
+                status: 'success',
+                success: true,
+                data: students,
+                pagination: getPagination(total, page, limit),
+                message: 'All students fetched successfully'
+            });
+        }
+    );
 
 // Get All Students List Used In All Forms
 export const getAllStudentsList = asyncHandler(
