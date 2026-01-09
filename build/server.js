@@ -69,7 +69,7 @@ app.use((0, cors_1.default)({
             callback(null, true);
         }
         else {
-            callback(new error_handler_middleware_1.default('Blocked by Cors error', 422));
+            callback(new error_handler_middleware_1.default('Blocked by Cors errors', 422));
         }
     },
     credentials: true

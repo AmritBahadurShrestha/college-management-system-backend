@@ -34,10 +34,19 @@ exports.getAllAttendance = (0, async_handler_utils_1.asyncHandler)((req, res, ne
     const page = Number(current_page) || 1;
     const limit = Number(per_page) || 5;
     const skip = (page - 1) * limit;
+    // let filter:any ={}
+    // if(query){
+    //     filter.$or=[
+    //         {
+    //           name: query,
+    //           option: "i" 
+    //         }
+    //     ]
+    // }
     // Total number of records
     const total = yield attendance_model_1.default.countDocuments();
     // Fetch records with pagination
-    const records = yield attendance_model_1.default.find().populate('student class course').sort({ createdAt: -1 }).limit(limit).skip(skip);
+    const records = yield attendance_model_1.default.find({}).populate('student class course').sort({ createdAt: -1 }).limit(limit).skip(skip);
     res.status(200).json({
         status: 'success',
         success: true,
