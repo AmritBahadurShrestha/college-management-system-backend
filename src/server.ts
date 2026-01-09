@@ -41,6 +41,7 @@ app.use(cors({
     },
     credentials: true
 }));
+
 app.use(helmet());
 
 // Use Cookie Parser
