@@ -60,8 +60,8 @@ export const createStudent = asyncHandler(
     export const getAllStudents = asyncHandler(
         async (req: Request, res: Response, next: NextFunction) => {
 
-            const { current_page, per_page } = req.query;
-            const {query} = req.body
+            const { current_page, per_page,query } = req.query;
+            // const {query} = req.body
 
         
 
