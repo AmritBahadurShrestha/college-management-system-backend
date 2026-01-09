@@ -35,7 +35,7 @@ app.use(cors({
         if (allowed_origins.includes(origin)) {
             callback(null, true)
         } else {
-            callback(new CustomError('Blocked by Cors error', 422))
+            callback(new CustomError('Blocked by Cors errors', 422))
         }
         
     },
