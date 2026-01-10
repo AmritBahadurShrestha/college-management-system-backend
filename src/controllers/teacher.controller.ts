@@ -48,17 +48,29 @@ export const createTeacher = asyncHandler(
 export const getAllTeachers = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
 
-        const { current_page, per_page } = req.query;
+        const { current_page, per_page, query } = req.query;
 
         const page = Number(current_page) || 1;
         const limit = Number(per_page) || 5;
         const skip = (page - 1) * limit;
 
+        const searchQuery = typeof query === 'string'? query:''
+
+        let filter:any = {}
+
+        if (searchQuery) {
+            filter.$or = [
+                {
+                    fullName: { $regex: searchQuery, $options: 'i' }
+                }
+            ]
+        }
+
         // Total number of teachers
-        const total = await Teacher.countDocuments();
+        const total = await Teacher.countDocuments(filter);
 
         // Fetch teachers with pagination
-        const teachers = await Teacher.find().populate('courses').sort({ createdAt: -1 }).limit(limit).skip(skip);
+        const teachers = await Teacher.find(filter).populate('courses').sort({ createdAt: -1 }).limit(limit).skip(skip);
 
         res.status(200).json({
             status: 'success',

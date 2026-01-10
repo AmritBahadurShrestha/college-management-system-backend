@@ -60,12 +60,12 @@ exports.getAllStudents = (0, async_handler_utils_1.asyncHandler)((req, res, next
     const page = Number(current_page) || 1;
     const limit = Number(per_page) || 5;
     const skip = (page - 1) * limit;
-    const searchQuery = typeof query === "string" ? query : "";
+    const searchQuery = typeof query === 'string' ? query : '';
     let filter = {};
     if (searchQuery) {
         filter.$or = [
             {
-                fullName: { $regex: searchQuery, $options: "i" }
+                fullName: { $regex: searchQuery, $options: 'i' }
             }
         ];
     }

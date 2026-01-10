@@ -46,14 +46,23 @@ exports.createTeacher = (0, async_handler_utils_1.asyncHandler)((req, res, next)
 }));
 // Get All Teachers
 exports.getAllTeachers = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { current_page, per_page } = req.query;
+    const { current_page, per_page, query } = req.query;
     const page = Number(current_page) || 1;
     const limit = Number(per_page) || 5;
     const skip = (page - 1) * limit;
+    const searchQuery = typeof query === 'string' ? query : '';
+    let filter = {};
+    if (searchQuery) {
+        filter.$or = [
+            {
+                fullName: { $regex: searchQuery, $options: 'i' }
+            }
+        ];
+    }
     // Total number of teachers
-    const total = yield teacher_model_1.default.countDocuments();
+    const total = yield teacher_model_1.default.countDocuments(filter);
     // Fetch teachers with pagination
-    const teachers = yield teacher_model_1.default.find().populate('courses').sort({ createdAt: -1 }).limit(limit).skip(skip);
+    const teachers = yield teacher_model_1.default.find(filter).populate('courses').sort({ createdAt: -1 }).limit(limit).skip(skip);
     res.status(200).json({
         status: 'success',
         success: true,
