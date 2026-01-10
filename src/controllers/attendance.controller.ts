@@ -178,29 +178,3 @@ export const getAttendanceByClassId = asyncHandler(
         });
     }
 );
-
-
-
-
-export const markAttendance = asyncHandler(async (req, res) => {
-  const { studentId, classId, courseId, date, status } = req.body;
-
-  const attendance = await Attendance.findOneAndUpdate(
-    { student: studentId, course: courseId, date },
-    {
-      student: studentId,
-      class: classId,
-      course: courseId,
-      date,
-      status,
-      markedBy: req.user._id
-    },
-    { upsert: true, new: true }
-  );
-
-  res.status(200).json({
-    success: true,
-    data: attendance,
-    message: 'Attendance updated'
-  });
-});

@@ -206,8 +206,7 @@ export const deleteStudent = asyncHandler(
     }
 );
 
-
-
+// Get Students By Class
 export const getStudentsByClass = asyncHandler(async (req, res) => {
   const { classId } = req.params;
 
@@ -219,4 +218,3 @@ export const getStudentsByClass = asyncHandler(async (req, res) => {
     message: 'Students fetched successfully',
   });
 });
-
