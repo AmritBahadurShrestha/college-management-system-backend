@@ -215,7 +215,7 @@ export const getStudentsByClass = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    data: students,
+    data: [...students],
     message: 'Students fetched successfully'
   });
 });

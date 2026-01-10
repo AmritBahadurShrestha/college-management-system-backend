@@ -16,4 +16,5 @@ router.delete('/:id', (0, auth_middleware_1.authenticate)(global_types_1.allAdmi
 router.get('/student/:studentId', attendance_controller_1.getAttendanceByStudentId);
 router.get('/course/:courseId', attendance_controller_1.getAttendanceByCourseId);
 router.get('/class/:classId', attendance_controller_1.getAttendanceByClassId);
+router.post('/attendance/bulk', attendance_controller_1.createBulkAttendance);
 exports.default = router;

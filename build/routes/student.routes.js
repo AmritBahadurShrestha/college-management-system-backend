@@ -16,4 +16,5 @@ router.get('/all', student_controller_1.getAllStudentsList);
 router.get('/:id', student_controller_1.getStudentById);
 router.put('/:id', (0, auth_middleware_1.authenticate)(global_types_1.onlyAdmin), upload.single('profile'), student_controller_1.updateStudent);
 router.delete('/:id', (0, auth_middleware_1.authenticate)(global_types_1.onlyAdmin), student_controller_1.deleteStudent);
+router.get('/class/:classId', student_controller_1.getStudentsByClass);
 exports.default = router;
