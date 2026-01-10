@@ -180,29 +180,27 @@ export const getAttendanceByClassId = asyncHandler(
 );
 
 
-export const createBulkAttendance = asyncHandler(async (req, res) => {
-  const { classId, course, date, records } = req.body;
 
-  if (!records || !records.length) {
-    return res.status(400).json({
-      success: false,
-      message: 'No attendance records provided',
-    });
-  }
 
-  const attendanceDocs = records.map((item:any) => ({
-    student: item.student,
-    class: classId,
-    course,
-    date,
-    status: item.status,
-    remarks: item.remarks || '',
-  }));
+export const markAttendance = asyncHandler(async (req, res) => {
+  const { studentId, classId, courseId, date, status } = req.body;
 
-  await Attendance.insertMany(attendanceDocs);
+  const attendance = await Attendance.findOneAndUpdate(
+    { student: studentId, course: courseId, date },
+    {
+      student: studentId,
+      class: classId,
+      course: courseId,
+      date,
+      status,
+      markedBy: req.user._id
+    },
+    { upsert: true, new: true }
+  );
 
-  res.status(201).json({
+  res.status(200).json({
     success: true,
-    message: 'Attendance saved successfully',
+    data: attendance,
+    message: 'Attendance updated'
   });
 });
