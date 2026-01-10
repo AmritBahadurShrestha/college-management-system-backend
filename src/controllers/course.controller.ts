@@ -24,17 +24,29 @@ export const createCourse = asyncHandler(
 export const getAllCourses = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
 
-        const { current_page, per_page } = req.query;
+        const { current_page, per_page, query } = req.query;
 
         const page = Number(current_page) || 1;
         const limit = Number(per_page) || 5;
         const skip = (page - 1) * limit;
 
+        const searchQuery = typeof query === 'string'? query:''
+
+        let filter:any = {}
+
+        if (searchQuery) {
+            filter.$or = [
+                {
+                    name: { $regex: searchQuery, $options: 'i' }
+                }
+            ]
+        }
+
         // Total number of courses
-        const total = await Course.countDocuments();
+        const total = await Course.countDocuments(filter);
 
         // Fetch courses with pagination
-        const courses = await Course.find().sort({ createdAt: -1 }).limit(limit).skip(skip);
+        const courses = await Course.find(filter).sort({ createdAt: -1 }).limit(limit).skip(skip);
 
         res.status(200).json({
             status: 'success',

@@ -24,17 +24,29 @@ export const createClass = asyncHandler(
 export const getAllClasses = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
 
-        const { current_page, per_page } = req.query;
+        const { current_page, per_page, query } = req.query;
 
         const page = Number(current_page) || 1;
         const limit = Number(per_page) || 5;
         const skip = (page - 1) * limit;
 
+        const searchQuery = typeof query === 'string'? query:''
+
+        let filter:any = {}
+
+        if (searchQuery) {
+            filter.$or = [
+                {
+                    name: { $regex: searchQuery, $options: 'i' }
+                }
+            ]
+        }
+
         // Total number of classes
-        const total = await Class.countDocuments();
+        const total = await Class.countDocuments(filter);
 
         // Fetch classes with pagination
-        const Classes = await Class.find().populate('students courses teacher').sort({ createdAt: -1 }).limit(limit).skip(skip);
+        const Classes = await Class.find(filter).populate('students courses teacher').sort({ createdAt: -1 }).limit(limit).skip(skip);
 
         res.status(200).json({
             status: 'success',
