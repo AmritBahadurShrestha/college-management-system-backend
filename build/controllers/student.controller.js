@@ -162,6 +162,6 @@ exports.getStudentsByClass = (0, async_handler_utils_1.asyncHandler)((req, res) 
     res.status(200).json({
         success: true,
         data: students,
-        message: 'Students fetched successfully'
+        message: 'Students fetched successfully',
     });
 }));

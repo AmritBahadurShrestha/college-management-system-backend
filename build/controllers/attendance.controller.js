@@ -142,17 +142,23 @@ exports.getAttendanceByClassId = (0, async_handler_utils_1.asyncHandler)((req, r
 }));
 exports.createBulkAttendance = (0, async_handler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { classId, course, date, records } = req.body;
+    if (!records || !records.length) {
+        return res.status(400).json({
+            success: false,
+            message: 'No attendance records provided',
+        });
+    }
     const attendanceDocs = records.map((item) => ({
         student: item.student,
         class: classId,
         course,
         date,
         status: item.status,
-        remarks: item.remarks || ''
+        remarks: item.remarks || '',
     }));
     yield attendance_model_1.default.insertMany(attendanceDocs);
     res.status(201).json({
         success: true,
-        message: 'Attendance saved successfully'
+        message: 'Attendance saved successfully',
     });
 }));
