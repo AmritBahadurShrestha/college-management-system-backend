@@ -205,3 +205,17 @@ export const deleteStudent = asyncHandler(
         });
     }
 );
+
+
+
+export const getStudentsByClass = asyncHandler(async (req, res) => {
+  const { classId } = req.params;
+
+  const students = await Student.find({ class: classId });
+
+  res.status(200).json({
+    success: true,
+    data: students,
+    message: 'Students fetched successfully'
+  });
+});

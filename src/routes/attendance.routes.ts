@@ -7,7 +7,7 @@ import {
     deleteAttendance,
     getAttendanceByStudentId,
     getAttendanceByCourseId,
-    getAttendanceByClassId
+    getAttendanceByClassId, createBulkAttendance
 } from '../controllers/attendance.controller';
 import { allAdminsTeachers } from '../types/global.types';
 import { authenticate } from '../middlewares/auth.middleware';
@@ -22,5 +22,8 @@ router.delete('/:id', authenticate(allAdminsTeachers), deleteAttendance);
 router.get('/student/:studentId', getAttendanceByStudentId);
 router.get('/course/:courseId', getAttendanceByCourseId);
 router.get('/class/:classId', getAttendanceByClassId);
+
+router.post('/attendance/bulk', createBulkAttendance);
+
 
 export default router;

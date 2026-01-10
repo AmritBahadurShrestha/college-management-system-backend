@@ -30,14 +30,23 @@ exports.createCourse = (0, async_handler_utils_1.asyncHandler)((req, res, next) 
 }));
 // Get All Courses
 exports.getAllCourses = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { current_page, per_page } = req.query;
+    const { current_page, per_page, query } = req.query;
     const page = Number(current_page) || 1;
     const limit = Number(per_page) || 5;
     const skip = (page - 1) * limit;
+    const searchQuery = typeof query === 'string' ? query : '';
+    let filter = {};
+    if (searchQuery) {
+        filter.$or = [
+            {
+                name: { $regex: searchQuery, $options: 'i' }
+            }
+        ];
+    }
     // Total number of courses
-    const total = yield course_model_1.default.countDocuments();
+    const total = yield course_model_1.default.countDocuments(filter);
     // Fetch courses with pagination
-    const courses = yield course_model_1.default.find().sort({ createdAt: -1 }).limit(limit).skip(skip);
+    const courses = yield course_model_1.default.find(filter).sort({ createdAt: -1 }).limit(limit).skip(skip);
     res.status(200).json({
         status: 'success',
         success: true,

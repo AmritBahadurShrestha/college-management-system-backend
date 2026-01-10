@@ -178,3 +178,24 @@ export const getAttendanceByClassId = asyncHandler(
         });
     }
 );
+
+
+export const createBulkAttendance = asyncHandler(async (req, res) => {
+  const { classId, course, date, records } = req.body;
+
+  const attendanceDocs = records.map((item: any) => ({
+    student: item.student,
+    class: classId,
+    course,
+    date,
+    status: item.status,
+    remarks: item.remarks || ''
+  }));
+
+  await Attendance.insertMany(attendanceDocs);
+
+  res.status(201).json({
+    success: true,
+    message: 'Attendance saved successfully'
+  });
+});

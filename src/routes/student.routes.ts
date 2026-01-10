@@ -5,7 +5,7 @@ import {
     getAllStudentsList,
     getStudentById,
     updateStudent,
-    deleteStudent
+    deleteStudent, getStudentsByClass
 } from '../controllers/student.controller';
 import { onlyAdmin } from '../types/global.types';
 import { authenticate } from '../middlewares/auth.middleware';
@@ -21,5 +21,8 @@ router.get('/all', getAllStudentsList);
 router.get('/:id', getStudentById);
 router.put('/:id', authenticate(onlyAdmin), upload.single('profile'), updateStudent);
 router.delete('/:id', authenticate(onlyAdmin), deleteStudent);
+
+router.get('/class/:classId', getStudentsByClass);
+
 
 export default router;
