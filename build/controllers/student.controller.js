@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStudentsByClass = exports.deleteStudent = exports.updateStudent = exports.getStudentById = exports.getAllStudentsList = exports.getAllStudents = exports.createStudent = void 0;
+exports.getStudentsByClass = exports.getStudents = exports.deleteStudent = exports.updateStudent = exports.getStudentById = exports.getAllStudentsList = exports.getAllStudents = exports.createStudent = void 0;
 const student_model_1 = __importDefault(require("../models/student.model"));
 const pagination_utils_1 = require("../utils/pagination.utils");
 const async_handler_utils_1 = require("../utils/async-handler.utils");
@@ -154,6 +154,15 @@ exports.deleteStudent = (0, async_handler_utils_1.asyncHandler)((req, res, next)
         success: true,
         data: deletedStudent,
         message: 'Student deleted successfully'
+    });
+}));
+// Get Students For Chart
+exports.getStudents = (0, async_handler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const students = yield student_model_1.default.find();
+    res.status(200).json({
+        success: true,
+        data: students,
+        message: 'Students fetched successfully',
     });
 }));
 // Get Students By Class

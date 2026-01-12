@@ -15,6 +15,7 @@ import courseRoutes from './routes/course.routes';
 import classRoutes from './routes/class.routes';
 import attendanceRoutes from './routes/attendance.routes';
 import dashboardRoutes from './routes/dashboard.routes';
+import studentRoute from './routes/student.routes';
 
 const PORT = process.env.PORT;
 const DATABASE_URI = process.env.DATABASE_URI ?? '';
@@ -67,6 +68,7 @@ app.use('/api/course', courseRoutes);
 app.use('/api/class', classRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/students', studentRoute);
 
 // Custom Error
 app.use((req: Request, res: Response, next: NextFunction) => {
