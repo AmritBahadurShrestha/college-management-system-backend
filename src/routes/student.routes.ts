@@ -3,9 +3,11 @@ import {
     createStudent,
     getAllStudents,
     getAllStudentsList,
+    getStudents,
+    getStudentsByClass,
     getStudentById,
     updateStudent,
-    deleteStudent, getStudents, getStudentsByClass
+    deleteStudent
 } from '../controllers/student.controller';
 import { onlyAdmin } from '../types/global.types';
 import { authenticate } from '../middlewares/auth.middleware';
@@ -19,10 +21,9 @@ router.post('/', authenticate(onlyAdmin), upload.single('profile'), createStuden
 router.get('/', getAllStudents);
 router.get('/all', getAllStudentsList);
 router.get('/chart', getStudents);
+router.get('/class/:classId', getStudentsByClass);
 router.get('/:id', getStudentById);
 router.put('/:id', authenticate(onlyAdmin), upload.single('profile'), updateStudent);
 router.delete('/:id', authenticate(onlyAdmin), deleteStudent);
-router.get('/class/:classId', getStudentsByClass);
-
 
 export default router;
