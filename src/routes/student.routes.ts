@@ -18,10 +18,10 @@ const upload = uploader();
 router.post('/', authenticate(onlyAdmin), upload.single('profile'), createStudent);
 router.get('/', getAllStudents);
 router.get('/all', getAllStudentsList);
+router.get('/chart', getStudents);
 router.get('/:id', getStudentById);
 router.put('/:id', authenticate(onlyAdmin), upload.single('profile'), updateStudent);
 router.delete('/:id', authenticate(onlyAdmin), deleteStudent);
-router.get('/chart', getStudents);
 router.get('/class/:classId', getStudentsByClass);
 
 
