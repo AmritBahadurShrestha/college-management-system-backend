@@ -206,6 +206,18 @@ export const deleteStudent = asyncHandler(
     }
 );
 
+// Get Students For Chart
+export const getStudents = asyncHandler(async (req, res) => {
+
+  const students = await Student.find();
+
+  res.status(200).json({
+    success: true,
+    data: students,
+    message: 'Students fetched successfully',
+  });
+});
+
 // Get Students By Class
 export const getStudentsByClass = asyncHandler(async (req, res) => {
   const { classId } = req.params;

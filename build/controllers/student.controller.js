@@ -156,6 +156,7 @@ exports.deleteStudent = (0, async_handler_utils_1.asyncHandler)((req, res, next)
         message: 'Student deleted successfully'
     });
 }));
+// Get Students By Class
 exports.getStudentsByClass = (0, async_handler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { classId } = req.params;
     const students = yield student_model_1.default.find({ class: classId });

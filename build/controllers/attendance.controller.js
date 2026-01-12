@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createBulkAttendance = exports.getAttendanceByClassId = exports.getAttendanceByCourseId = exports.getAttendanceByStudentId = exports.deleteAttendance = exports.updateAttendance = exports.getAttendanceById = exports.getAllAttendance = exports.createAttendance = void 0;
+exports.getAttendanceByClassId = exports.getAttendanceByCourseId = exports.getAttendanceByStudentId = exports.deleteAttendance = exports.updateAttendance = exports.getAttendanceById = exports.getAllAttendance = exports.createAttendance = void 0;
 const attendance_model_1 = __importDefault(require("../models/attendance.model"));
 const pagination_utils_1 = require("../utils/pagination.utils");
 const async_handler_utils_1 = require("../utils/async-handler.utils");
@@ -138,27 +138,5 @@ exports.getAttendanceByClassId = (0, async_handler_utils_1.asyncHandler)((req, r
         success: true,
         data: record,
         message: 'Attendance records for the class fetched successfully'
-    });
-}));
-exports.createBulkAttendance = (0, async_handler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { classId, course, date, records } = req.body;
-    if (!records || !records.length) {
-        return res.status(400).json({
-            success: false,
-            message: 'No attendance records provided',
-        });
-    }
-    const attendanceDocs = records.map((item) => ({
-        student: item.student,
-        class: classId,
-        course,
-        date,
-        status: item.status,
-        remarks: item.remarks || '',
-    }));
-    yield attendance_model_1.default.insertMany(attendanceDocs);
-    res.status(201).json({
-        success: true,
-        message: 'Attendance saved successfully',
     });
 }));
