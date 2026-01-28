@@ -14,7 +14,6 @@ export interface IJWTDecoderPayload extends IJWTPayload {
 }
 
 export const onlyAdmin = [Role.ADMIN];
-export const onlyUser = [Role.USER];
 export const onlyStudent = [Role.STUDENT];
 export const onlyTeacher = [Role.TEACHER];
 export const allAdminsTeachers = [...onlyAdmin, ...onlyTeacher]
