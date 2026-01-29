@@ -42,6 +42,7 @@ const express_1 = __importDefault(require("express"));
 const database_config_1 = require("./config/database.config");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 require("dotenv/config");
+const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 // Import Routes
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
@@ -55,16 +56,17 @@ const dashboard_routes_1 = __importDefault(require("./routes/dashboard.routes"))
 const PORT = process.env.PORT;
 const DATABASE_URI = (_a = process.env.DATABASE_URI) !== null && _a !== void 0 ? _a : '';
 const app = (0, express_1.default)();
-const allowed_origins = [
-    process.env.FRONT_END_LOCAL_URL,
-    process.env.FRONT_END_LIVE_URL,
-    process.env.FRONT_END_LIVE_URL_2,
-    process.env.FRONT_END_LIVE_URL_3,
-    "127.0.0.1",
-];
+// const allowed_origins = [
+//     process.env.FRONT_END_LOCAL_URL,
+//     process.env.FRONT_END_LIVE_URL,
+// ]
 // Connect DataBase
 (0, database_config_1.connectDatabase)(DATABASE_URI);
 // Use Middlewares
+app.use((0, cors_1.default)({
+    origin: process.env.FRONT_END_LOCAL_URL || process.env.FRONT_END_LIVE_URL,
+    credentials: true
+}));
 // app.use(cors({
 //     origin: (origin, callback) => {
 //         if (allowed_origins.includes(origin)) {

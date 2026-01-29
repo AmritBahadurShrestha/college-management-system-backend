@@ -21,19 +21,19 @@ const DATABASE_URI = process.env.DATABASE_URI ?? '';
 
 const app = express();
 
-const allowed_origins = [
-    process.env.FRONT_END_LOCAL_URL,
-    process.env.FRONT_END_LIVE_URL,
-    process.env.FRONT_END_LIVE_URL_2,
-    process.env.FRONT_END_LIVE_URL_3,
-    "127.0.0.1",
-    
-]
+// const allowed_origins = [
+//     process.env.FRONT_END_LOCAL_URL,
+//     process.env.FRONT_END_LIVE_URL,
+// ]
 
 // Connect DataBase
 connectDatabase(DATABASE_URI);
 
 // Use Middlewares
+app.use(cors({
+  origin: process.env.FRONT_END_LOCAL_URL || process.env.FRONT_END_LIVE_URL,
+  credentials: true
+}));
 // app.use(cors({
 //     origin: (origin, callback) => {
 //         if (allowed_origins.includes(origin)) {
