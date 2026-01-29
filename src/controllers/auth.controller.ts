@@ -9,7 +9,7 @@ import { generateToken } from '../utils/jwt.utils';
 // Register User
 export const register = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const { fullName, email, password, phone, gender, role } = req.body;
+        const { fullName, email, password, phone, role } = req.body;
 
         if (!password) {
             throw new CustomError('Password is required', 400);
@@ -21,7 +21,6 @@ export const register = asyncHandler(
             email,
             password,
             phone,
-            gender,
             role,
         });
 
