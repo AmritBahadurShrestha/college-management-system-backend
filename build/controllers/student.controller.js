@@ -19,7 +19,7 @@ const async_handler_utils_1 = require("../utils/async-handler.utils");
 const error_handler_middleware_1 = __importDefault(require("../middlewares/error-handler.middleware"));
 const cloudinary_service_utils_1 = require("../utils/cloudinary-service.utils");
 // import { sendEmail } from '../utils/nodemailer.utils';
-// import { generate_student_account_email } from '../utils/email.utils';
+// import { generatePassword } from '../utils/PasswordGenerator.utils';
 // Register Student Profile
 const folder_name = '/students';
 // Create Student
@@ -40,10 +40,13 @@ exports.createStudent = (0, async_handler_utils_1.asyncHandler)((req, res, next)
     };
     yield student.save();
     //! Generate random password
-    // const password = Math.random().toString(36).slice(-8);
+    // const password = await generatePassword();
     // await sendEmail({
-    //     html: generate_student_account_email(student, password),
-    //     subject: 'Your Student Account Details',
+    //     html:`
+    //         <div>Your login password: ${password}</div>
+    //         <p>please! change your password after login</p>
+    //         `,
+    //     subject: 'Login Password',
     //     to: student.email,
     // });
     res.status(201).json({

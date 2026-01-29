@@ -23,7 +23,10 @@ const app = express();
 
 const allowed_origins = [
     process.env.FRONT_END_LOCAL_URL,
-    process.env.FRONT_END_LIVE_URL
+    process.env.FRONT_END_LIVE_URL,
+    process.env.FRONT_END_LIVE_URL_2,
+    process.env.FRONT_END_LIVE_URL_3,
+    "192.168.1.67"
 ]
 
 // Connect DataBase
