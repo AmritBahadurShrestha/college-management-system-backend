@@ -26,24 +26,25 @@ const allowed_origins = [
     process.env.FRONT_END_LIVE_URL,
     process.env.FRONT_END_LIVE_URL_2,
     process.env.FRONT_END_LIVE_URL_3,
-    "192.168.1.67"
+    "127.0.0.1",
+    
 ]
 
 // Connect DataBase
 connectDatabase(DATABASE_URI);
 
 // Use Middlewares
-app.use(cors({
-    origin: (origin, callback) => {
-        if (allowed_origins.includes(origin)) {
-            callback(null, true)
-        } else {
-            callback(new CustomError('Blocked by Cors errors', 422))
-        }
+// app.use(cors({
+//     origin: (origin, callback) => {
+//         if (allowed_origins.includes(origin)) {
+//             callback(null, true)
+//         } else {
+//             callback(new CustomError('Blocked by Cors errors', 422))
+//         }
         
-    },
-    credentials: true
-}));
+//     },
+//     credentials: true
+// }));
 
 app.use(helmet());
 

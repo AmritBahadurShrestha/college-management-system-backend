@@ -42,7 +42,6 @@ const express_1 = __importDefault(require("express"));
 const database_config_1 = require("./config/database.config");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 require("dotenv/config");
-const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 // Import Routes
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
@@ -58,22 +57,24 @@ const DATABASE_URI = (_a = process.env.DATABASE_URI) !== null && _a !== void 0 ?
 const app = (0, express_1.default)();
 const allowed_origins = [
     process.env.FRONT_END_LOCAL_URL,
-    process.env.FRONT_END_LIVE_URL
+    process.env.FRONT_END_LIVE_URL,
+    process.env.FRONT_END_LIVE_URL_2,
+    process.env.FRONT_END_LIVE_URL_3,
+    "127.0.0.1",
 ];
 // Connect DataBase
 (0, database_config_1.connectDatabase)(DATABASE_URI);
 // Use Middlewares
-app.use((0, cors_1.default)({
-    origin: (origin, callback) => {
-        if (allowed_origins.includes(origin)) {
-            callback(null, true);
-        }
-        else {
-            callback(new error_handler_middleware_1.default('Blocked by Cors errors', 422));
-        }
-    },
-    credentials: true
-}));
+// app.use(cors({
+//     origin: (origin, callback) => {
+//         if (allowed_origins.includes(origin)) {
+//             callback(null, true)
+//         } else {
+//             callback(new CustomError('Blocked by Cors errors', 422))
+//         }
+//     },
+//     credentials: true
+// }));
 app.use((0, helmet_1.default)());
 // Use Cookie Parser
 app.use((0, cookie_parser_1.default)());
