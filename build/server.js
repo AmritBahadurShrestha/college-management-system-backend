@@ -60,13 +60,13 @@ const app = (0, express_1.default)();
 //     process.env.FRONT_END_LOCAL_URL,
 //     process.env.FRONT_END_LIVE_URL,
 // ]
+const allowedOrigins = [
+    process.env.FRONT_END_LOCAL_URL,
+    process.env.FRONT_END_LIVE_URL,
+].filter(Boolean);
 // Connect DataBase
 (0, database_config_1.connectDatabase)(DATABASE_URI);
 // Use Middlewares
-app.use((0, cors_1.default)({
-    origin: process.env.FRONT_END_LOCAL_URL || process.env.FRONT_END_LIVE_URL,
-    credentials: true
-}));
 // app.use(cors({
 //     origin: (origin, callback) => {
 //         if (allowed_origins.includes(origin)) {
@@ -77,6 +77,20 @@ app.use((0, cors_1.default)({
 //     },
 //     credentials: true
 // }));
+app.use((0, cors_1.default)({
+    origin: (origin, callback) => {
+        // Allow Postman / server requests
+        if (!origin)
+            return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        }
+        else {
+            callback(new Error('CORS blocked'));
+        }
+    },
+    credentials: true,
+}));
 app.use((0, helmet_1.default)());
 // Use Cookie Parser
 app.use((0, cookie_parser_1.default)());
