@@ -24,14 +24,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logout = exports.getCurrentUser = exports.changePassword = exports.login = exports.register = void 0;
+const error_handler_middleware_1 = __importDefault(require("../middlewares/error-handler.middleware"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 const async_handler_utils_1 = require("../utils/async-handler.utils");
-const error_handler_middleware_1 = __importDefault(require("../middlewares/error-handler.middleware"));
 const bcrypt_utils_1 = require("../utils/bcrypt.utils");
 const jwt_utils_1 = require("../utils/jwt.utils");
 // Register User
 exports.register = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { fullName, email, password, phone, gender, role } = req.body;
+    const { fullName, email, password, phone, role } = req.body;
+    console.log("  Api hitted =>  ", req === null || req === void 0 ? void 0 : req.body);
     if (!password) {
         throw new error_handler_middleware_1.default('Password is required', 400);
     }
@@ -41,7 +42,6 @@ exports.register = (0, async_handler_utils_1.asyncHandler)((req, res, next) => _
         email,
         password,
         phone,
-        gender,
         role,
     });
     const hashedPassword = yield (0, bcrypt_utils_1.hashPassword)(password);

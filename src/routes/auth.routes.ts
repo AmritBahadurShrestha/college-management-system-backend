@@ -1,20 +1,20 @@
-import express from 'express';
+import express from "express";
 import {
-    register,
-    login,
-    getCurrentUser,
-    changePassword,
-    logout
-} from '../controllers/auth.controller';
-import { authenticate } from '../middlewares/auth.middleware';
-import { allAST, onlyAdmin } from '../types/global.types';
+  changePassword,
+  changeRole,
+  getCurrentUser,
+  login,
+  logout,
+  register,
+} from "../controllers/auth.controller";
 
 const router = express.Router();
 
-router.post('/signup', register);
-router.post('/login', login);
-router.get('/me', authenticate(allAST), getCurrentUser);
-router.post('/change-password', changePassword);
-router.post('/logout', logout);
+router.post("/signup", register);
+router.post("/login", login);
+router.get("/me", getCurrentUser);
+router.post("/change-password", changePassword);
+router.post("/logout", logout);
+router.patch("/changeRole", changeRole);
 
 export default router;

@@ -1,8 +1,8 @@
-import Attendance from '../models/attendance.model';
-import { Request, Response, NextFunction } from 'express';
-import { getPagination } from '../utils/pagination.utils';
-import { asyncHandler } from '../utils/async-handler.utils';
+import { NextFunction, Request, Response } from 'express';
 import CustomError from '../middlewares/error-handler.middleware';
+import Attendance from '../models/attendance.model';
+import { asyncHandler } from '../utils/async-handler.utils';
+import { getPagination } from '../utils/pagination.utils';
 
 // Mark Attendance
 export const createAttendance = asyncHandler(

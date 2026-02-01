@@ -1,11 +1,14 @@
-import Student from '../models/student.model';
-import { getPagination } from '../utils/pagination.utils';
-import { Request, Response, NextFunction } from 'express';
-import { asyncHandler } from '../utils/async-handler.utils';
+import { NextFunction, Request, Response } from 'express';
 import CustomError from '../middlewares/error-handler.middleware';
-import { uploadFile, deleteFiles } from '../utils/cloudinary-service.utils';
-// import { sendEmail } from '../utils/nodemailer.utils';
-// import { generatePassword } from '../utils/PasswordGenerator.utils';
+import Attendance from '../models/attendance.model';
+import Student from '../models/student.model';
+import User from '../models/user.model';
+import { asyncHandler } from '../utils/async-handler.utils';
+import { hashPassword } from '../utils/bcrypt.utils';
+import { deleteFiles, uploadFile } from '../utils/cloudinary-service.utils';
+import { sendEmail } from '../utils/nodemailer.utils';
+import { getPagination } from '../utils/pagination.utils';
+import { generatePassword } from '../utils/PasswordGenerator.utils';
 
 // Register Student Profile
 const folder_name = '/students';
@@ -13,7 +16,13 @@ const folder_name = '/students';
 // Create Student
 export const createStudent = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const payload = req.body;
+        
+        // 1. get details 
+            const { fullName, email, phone, address, dob, gender, rollNumber, registrationNumber, program, semester, courses,classes, role = 'STUDENT' } = req.body;
+        
+        
+        console.log("fullName:", fullName, "email:", email, "phone:", phone, "address:", address, "dob:", dob, "gender:", gender, "rollNumber:", rollNumber, "registrationNumber:", registrationNumber, "program:", program, "semester:", semester, "courses:", courses, "classes:", classes, "role:", role);
+
 
         // Handle profile upload
         const profile = req.file as Express.Multer.File;
@@ -23,7 +32,7 @@ export const createStudent = asyncHandler(
         }
 
         // Creating Student Instance
-        const student = new Student(payload);
+        const student = new Student({ fullName, email, phone, address, dob, gender, rollNumber, registrationNumber, program, semester,classes, courses, role  });
 
         const { path, public_id } = await uploadFile(
             profile.path,
@@ -39,16 +48,34 @@ export const createStudent = asyncHandler(
         await student.save();
 
         //! Generate random password
-        // const password = await generatePassword();
+        const password =  generatePassword();
 
-        // await sendEmail({
-        //     html:`
-        //         <div>Your login password: ${password}</div>
-        //         <p>please! change your password after login</p>
-        //         `,
-        //     subject: 'Login Password',
-        //     to: student.email,
-        // });
+        // 2. usermodel into username, password , isnewAdded
+        const user: any = await User.create({
+            fullName,
+            email,
+            password,
+            phone,
+            role,
+            isnewAdded: true
+        });
+
+        const hashedPassword = await hashPassword(password);
+        user.password = hashedPassword;
+        await user.save();
+
+        console.log("password => ", password , " email => ", student.email        )
+        await sendEmail({
+            html:`
+            <div>Your login email: ${student.email}</div>
+            <div>Your login password: ${password}</div>
+                <p>please! change your password after login</p>
+                `,
+            subject: 'Login Password',
+            to: student.email,
+        });
+
+        
 
         res.status(201).json({
             status: "success",
@@ -118,18 +145,20 @@ export const getAllStudentsList = asyncHandler(
 // Get Student By ID
 export const getStudentById = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const { id } = req.params;
-
-        const student = await Student.findById(id).populate('courses');
-
+        const { email } = req.params;
+        
+        // 1. studentId 
+        const student = await Student.findOne({email: email}).populate('courses').populate("classes");
         if (!student) {
             throw new CustomError('Student not found', 404);
         }
+        const attendInfo = await Attendance.findOne({student: student._id})
+        // console.log("student => ", student, " email ->  ", email)
 
         res.status(200).json({
             status: 'success',
             success: true,
-            data: student,
+            data: {student, attendInfo},
             message: 'Student fetched successfully'
         });
     }
@@ -233,3 +262,51 @@ export const getStudentsByClass = asyncHandler(async (req, res) => {
     message: 'Students fetched successfully',
   });
 });
+
+
+
+// Get All by filter // class + course 
+export const getAllStudentsFilter = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const { current_page, per_page } = req.query;
+        // console.log("body => ", req?.body)
+        const { class: className, course } = req.body ;
+        
+        const page = Number(current_page) || 1;
+        const limit = Number(per_page) || 5;
+        const skip = (page - 1) * limit;
+
+        let filter: any = {};
+
+        // Filter by class name
+        if (className && className.trim() !== '') {
+            filter.classes = className;
+        }
+
+        // Filter by course (if courses is an array field in Student schema)
+        if (course && course.trim() !== '') {
+            filter.courses = course; 
+        }
+
+        // Total number of students matching the filter
+        const total = await Student.countDocuments(filter);
+
+        // Fetch students with pagination
+        const students = await Student.find(filter)
+            .populate('courses')
+            .populate('classes')
+            .sort({ createdAt: -1 })
+            .limit(limit)
+            .skip(skip);
+
+        console.log(students);
+        
+        res.status(200).json({
+            status: 'success',
+            success: true,
+            data: students,
+            pagination: getPagination(total, page, limit),
+            message: 'Students fetched successfully'
+        });
+    }
+);

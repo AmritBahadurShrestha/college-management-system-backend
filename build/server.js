@@ -37,22 +37,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
-const error_handler_middleware_1 = __importStar(require("./middlewares/error-handler.middleware"));
-const express_1 = __importDefault(require("express"));
-const database_config_1 = require("./config/database.config");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 require("dotenv/config");
-const cors_1 = __importDefault(require("cors"));
+const express_1 = __importDefault(require("express"));
 const helmet_1 = __importDefault(require("helmet"));
+const database_config_1 = require("./config/database.config");
+const error_handler_middleware_1 = __importStar(require("./middlewares/error-handler.middleware"));
 // Import Routes
+const attendance_routes_1 = __importDefault(require("./routes/attendance.routes"));
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
-const user_routes_1 = __importDefault(require("./routes/user.routes"));
+const class_routes_1 = __importDefault(require("./routes/class.routes"));
+const course_routes_1 = __importDefault(require("./routes/course.routes"));
+const dashboard_routes_1 = __importDefault(require("./routes/dashboard.routes"));
 const student_routes_1 = __importDefault(require("./routes/student.routes"));
 const teacher_routes_1 = __importDefault(require("./routes/teacher.routes"));
-const course_routes_1 = __importDefault(require("./routes/course.routes"));
-const class_routes_1 = __importDefault(require("./routes/class.routes"));
-const attendance_routes_1 = __importDefault(require("./routes/attendance.routes"));
-const dashboard_routes_1 = __importDefault(require("./routes/dashboard.routes"));
+const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const PORT = process.env.PORT;
 const DATABASE_URI = (_a = process.env.DATABASE_URI) !== null && _a !== void 0 ? _a : '';
 const app = (0, express_1.default)();
@@ -60,10 +59,6 @@ const app = (0, express_1.default)();
 //     process.env.FRONT_END_LOCAL_URL,
 //     process.env.FRONT_END_LIVE_URL,
 // ]
-const allowedOrigins = [
-    process.env.FRONT_END_LOCAL_URL,
-    process.env.FRONT_END_LIVE_URL,
-].filter(Boolean);
 // Connect DataBase
 (0, database_config_1.connectDatabase)(DATABASE_URI);
 // Use Middlewares
@@ -77,20 +72,6 @@ const allowedOrigins = [
 //     },
 //     credentials: true
 // }));
-app.use((0, cors_1.default)({
-    origin: (origin, callback) => {
-        // Allow Postman / server requests
-        if (!origin)
-            return callback(null, true);
-        if (allowedOrigins.includes(origin)) {
-            callback(null, true);
-        }
-        else {
-            callback(new Error('CORS blocked'));
-        }
-    },
-    credentials: true,
-}));
 app.use((0, helmet_1.default)());
 // Use Cookie Parser
 app.use((0, cookie_parser_1.default)());
@@ -119,7 +100,7 @@ app.use((req, res, next) => {
     next(err);
 });
 app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
+    console.log(`Server is running at ${PORT}`);
 });
 // Error Handling
 app.use(error_handler_middleware_1.errorHandler);

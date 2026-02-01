@@ -1,17 +1,17 @@
 export enum Role {
-    ADMIN = 'ADMIN',
-    STUDENT = 'STUDENT',
-    TEACHER = 'TEACHER'
+  ADMIN = "ADMIN",
+  STUDENT = "STUDENT",
+  TEACHER = "TEACHER",
 }
 
 export enum Gender {
-    MALE = 'MALE',
-    FEMALE = 'FEMALE',
-    OTHER = 'OTHER'
+  MALE = "MALE",
+  FEMALE = "FEMALE",
+  OTHER = "OTHER",
 }
 
 export enum AttendanceStatus {
-    PRESENT = 'PRESENT',
-    ABSENT = 'ABSENT',
-    LEAVE = 'LEAVE',
+  PRESENT = "PRESENT",
+  ABSENT = "ABSENT",
+  LEAVE = "LEAVE",
 }

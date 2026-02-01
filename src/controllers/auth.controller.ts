@@ -1,16 +1,15 @@
-import User from '../models/user.model';
-import { Request, Response, NextFunction } from 'express';
-import { asyncHandler } from '../utils/async-handler.utils';
+import { NextFunction, Request, Response } from 'express';
 import CustomError from '../middlewares/error-handler.middleware';
-import { hashPassword, compareHash } from '../utils/bcrypt.utils';
+import User from '../models/user.model';
 import { IJWTPayload } from '../types/global.types';
-import { generateToken } from '../utils/jwt.utils';
+import { asyncHandler } from '../utils/async-handler.utils';
+import { compareHash, hashPassword } from '../utils/bcrypt.utils';
+import { generateToken, verifyToken } from '../utils/jwt.utils';
 
 // Register User
 export const register = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { fullName, email, password, phone, role } = req.body;
-
         if (!password) {
             throw new CustomError('Password is required', 400);
         }
@@ -102,37 +101,40 @@ export const login = asyncHandler(
 // Change Password
 export const changePassword = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const { email, old_password, new_password } = req.body;
 
-        if (!email) {
-            throw new CustomError('Email is required', 400);
-        }
+        const { old_password, new_password } = req.body;
+        const isAdded = req.body?.isAdded ?? false;
+        const jwtToken = req?.headers['x-access-token'];
+        
+        // 0 old pass , new pass xaina  return 
+            if (!old_password || !new_password ) {
+                // console.log("Old Password:", old_password, "New Password:", new_password, "isAdded:", isAdded);
+                throw new CustomError('Old password and new password are required', 400);
+            }
 
-        if (!old_password) {
-            throw new CustomError('Old password is required', 400);
-        }
+        // 1. jwt token 
+            if ( !jwtToken || typeof jwtToken !== 'string')  throw new CustomError('Invalid or missing token', 401);
 
-        if (!new_password) {
-            throw new CustomError('New password is required', 400);
-        }
+        // 2. token validate 
+            const userInfo = verifyToken(jwtToken)
+            // console.log("user info -=> ", userInfo)
 
-        // Check if user exists
-        const user = await User.findOne({ email }).select('+password');
+        // 3. check if email ready
+            const user = await User.findOne({email : userInfo?.email});
+            if (!user) throw new CustomError('User not found', 400);
+            // console.log("user => ", user)
 
-        if (!user) {
-            throw new CustomError('User not found', 400);
-        }
+        // 4. new password bcrypt hash 
+            const isPassMatched = compareHash(old_password, user.password);
+            if (!isPassMatched) {
+                throw new CustomError('Old password does not match.', 400);
+            }
+            user.password = await hashPassword(new_password);
 
-        const isPassMatched = compareHash(old_password, user.password);
-
-        if (!isPassMatched) {
-            throw new CustomError('Old password does not match.', 400);
-        }
-
-        user.password = await hashPassword(new_password);
-
-        await user.save();
-
+        // 5. update user (if isAdded = true )
+            user.isnewAdded = isAdded
+            await user.save();
+        
         res.status(200).json({
             status: 'success',
             success: true,
@@ -145,23 +147,31 @@ export const changePassword = asyncHandler(
 // Get Current Logged-in User
 export const getCurrentUser = asyncHandler(
     async (req: Request, res: Response) => {
-        const userId = req.user?._id;
 
-        if (!userId) {
-            throw new CustomError('Unauthorized', 400);
-        }
-
-        const user = await User.findById(userId);
-
-        if (!user) {
-            throw new CustomError('User not found', 400);
-        }
-
-        res.status(200).json({
+        // 1. jwt token 
+            const jwtToken = req?.headers['x-access-token'];
+            if ( !jwtToken || typeof jwtToken !== 'string')  throw new CustomError('Invalid or missing token', 401);
+          
+        // 2. token validate error 
+            const userInfo = verifyToken(jwtToken)
+            
+        // 3. check and return 
+            const user = await User.findById({_id: userInfo?._id});
+            if (!user) throw new CustomError('User not found', 400);
+        
+           
+            res.cookie(
+                'access_token', jwtToken, {
+                secure: process.env.NODE_ENV === 'development' ? false : true,
+                httpOnly: true,
+                maxAge: Number(process.env.COOKIE_EXPIRY) * 24 * 60 * 60 * 1000,
+                sameSite: 'none'
+            }
+        ).status(200).json({
             status: 'success',
-            success: true,
-            data: user,
-            message: 'Current user fetched successfully',
+                success: true,
+                data: user,
+                message: 'Current user fetched successfully',
         });
     }
 );
@@ -182,5 +192,38 @@ export const logout = asyncHandler(
             data: null,
             message: 'Logout successful',
         });
+    }
+);
+
+
+// Change Role
+export const changeRole = asyncHandler(
+    async (req: Request, res: Response) => {
+
+        // 1. jwt headers
+        const jwtToken = req?.headers['x-access-token'];
+        const {role} = req?.body; 
+        
+
+        if (typeof jwtToken !== 'string') {
+            throw new CustomError('Invalid or missing token', 401);
+        }        
+        
+        // 1.2 validated token 
+            const userInfo =  verifyToken(jwtToken);
+        // 2. email exist 
+            const isEmail = await User.findOne({email: userInfo?.email})
+            // console.log("email -> ", isEmail )
+        // 3. role changed 
+            await User.findOneAndUpdate({email: userInfo?.email}, {role: role.toUpperCase() })
+        // 4. response 
+            return res.status(204).json({
+            status: 'success',
+            success: true,
+            data: null,
+            message: 'Successful Update the Role ',
+        });
+
+        
     }
 );

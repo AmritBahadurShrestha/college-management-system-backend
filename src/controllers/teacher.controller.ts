@@ -1,47 +1,89 @@
-import Teacher from '../models/teacher.model';
-import { Request, Response, NextFunction } from 'express';
-import { getPagination } from '../utils/pagination.utils';
-import { asyncHandler } from '../utils/async-handler.utils';
+import { NextFunction, Request, Response } from 'express';
 import CustomError from '../middlewares/error-handler.middleware';
-import { uploadFile, deleteFiles } from '../utils/cloudinary-service.utils';
+import Teacher from '../models/teacher.model';
+import User from '../models/user.model';
+import { asyncHandler } from '../utils/async-handler.utils';
+import { hashPassword } from '../utils/bcrypt.utils';
+import { deleteFiles, uploadFile } from '../utils/cloudinary-service.utils';
+import { sendEmail } from '../utils/nodemailer.utils';
+import { getPagination } from '../utils/pagination.utils';
+import { generatePassword } from '../utils/PasswordGenerator.utils';
 
 // Register Teacher Profile
 const folder_name = '/teachers';
 
 // Create Teacher
 export const createTeacher = asyncHandler(
-    async (req: Request, res: Response, next: NextFunction) => {
-        const payload = req.body;
 
-        // Handle profile upload
-        const profile = req.file as Express.Multer.File;
+  async (req: Request, res: Response, next: NextFunction) => {
+    // 1. Get details 
+    const { fullName, email, phone, gender, department, courses, role = 'TEACHER' } = req.body;
+    
+    // Handle profile upload
+    const profile = req.file as Express.Multer.File;
 
-        if (!profile) {
-            throw new CustomError("Profile is required", 400);
-        }
+    if (!profile) {
+        throw new CustomError("Profile is required", 400);
+    }
 
-        // Creating Teacher Instance
-        const teacher = new Teacher(payload);
+    // Upload file first
+    const { path, public_id } = await uploadFile(
+        profile.path,
+        folder_name
+    );
 
-        const { path, public_id } = await uploadFile(
-            profile.path,
-            folder_name
-        );
+    // Generate random password
+    const password = generatePassword();
+    const hashedPassword = await hashPassword(password);
 
-        // Update new profile
-        teacher.profile = {
+    // Create Teacher Instance with ALL required fields
+    const teacher = await Teacher.create({
+        fullName,
+        email,
+        phone,
+        gender,
+        department,
+        courses,
+        role,
+        profile: {
             path,
             public_id,
-        };
-        await teacher.save();
+        }
+    });
 
-        res.status(201).json({
-            status: "success",
-            success: true,
-            data: teacher,
-            message: "Teacher created successfully",
+    const user: any = await User.create({
+            fullName,
+            email,
+            password:hashedPassword,
+            phone,
+            role,
+            isnewAdded: true
         });
-    }
+
+    console.log("Teacher created successfully");
+    console.log("password => ", password, " email => ", teacher.email);
+
+    // Send email with credentials
+    await sendEmail({
+        html: `
+            <div>Your login email: ${teacher.email}</div>
+            <div>Your login password: ${password}</div>
+            <p>Please change your password after login</p>
+        `,
+        subject: 'Login Password',
+        to: teacher.email,
+    });
+
+    res.status(201).json({
+        status: "success",
+        success: true,
+        data: teacher,
+        message: "Teacher created successfully",
+    });
+}
+
+
+    
 );
 
 // Get All Teachers
@@ -100,9 +142,9 @@ export const getAllTeachersList = asyncHandler(
 // Get Teacher By ID
 export const getTeacherById = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const { id } = req.params;
+        const { email } = req.params;
 
-        const teacher = await Teacher.findById(id).populate('courses');
+        const teacher = await Teacher.findOne({email: email}).populate('courses');
 
         if (!teacher) {
             throw new CustomError('Teacher not found', 404);
