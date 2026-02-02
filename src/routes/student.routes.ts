@@ -5,14 +5,15 @@ import {
   getAllStudents,
   getAllStudentsFilter,
   getAllStudentsList,
+  getStudentByEmail,
   getStudentById,
   getStudents,
   getStudentsByClass,
   updateStudent,
 } from "../controllers/student.controller";
+import { onlyAdmin } from "../types/global.types";
 import { authenticate } from "../middlewares/auth.middleware";
 import { uploader } from "../middlewares/uploader.middleware";
-import { onlyAdmin } from "../types/global.types";
 
 const router = express.Router();
 
@@ -29,7 +30,8 @@ router.get("/all", getAllStudentsList);
 router.get("/chart", getStudents);
 router.get("/class/:classId", getStudentsByClass);
 router.post("/filter", getAllStudentsFilter);
-router.get("/:email", getStudentById);
+router.get("/email/:email", getStudentByEmail);
+router.get("/:id", getStudentById);
 router.put(
   "/:id",
   authenticate(onlyAdmin),

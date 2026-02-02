@@ -4,12 +4,13 @@ import {
   deleteTeacher,
   getAllTeachers,
   getAllTeachersList,
+  getTeacherByEmail,
   getTeacherById,
   updateTeacher,
 } from "../controllers/teacher.controller";
+import { onlyAdmin } from "../types/global.types";
 import { authenticate } from "../middlewares/auth.middleware";
 import { uploader } from "../middlewares/uploader.middleware";
-import { onlyAdmin } from "../types/global.types";
 
 const router = express.Router();
 
@@ -23,7 +24,8 @@ router.post(
 );
 router.get("/", getAllTeachers);
 router.get("/all", getAllTeachersList);
-router.get("/:email", getTeacherById);
+router.get("/email/:email", getTeacherByEmail);
+router.get("/:id", getTeacherById);
 router.put(
   "/:id",
   authenticate(onlyAdmin),

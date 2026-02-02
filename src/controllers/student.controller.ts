@@ -17,12 +17,8 @@ const folder_name = '/students';
 export const createStudent = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         
-        // 1. get details 
-            const { fullName, email, phone, address, dob, gender, rollNumber, registrationNumber, program, semester, courses,classes, role = 'STUDENT' } = req.body;
-        
-        
-        console.log("fullName:", fullName, "email:", email, "phone:", phone, "address:", address, "dob:", dob, "gender:", gender, "rollNumber:", rollNumber, "registrationNumber:", registrationNumber, "program:", program, "semester:", semester, "courses:", courses, "classes:", classes, "role:", role);
-
+        // get details 
+        const { fullName, email, phone, address, dob, gender, rollNumber, registrationNumber, program, semester, courses, classes, role = 'STUDENT' } = req.body;
 
         // Handle profile upload
         const profile = req.file as Express.Multer.File;
@@ -50,7 +46,7 @@ export const createStudent = asyncHandler(
         //! Generate random password
         const password =  generatePassword();
 
-        // 2. usermodel into username, password , isnewAdded
+        // usermodel into username, password, isnewAdded
         const user: any = await User.create({
             fullName,
             email,
@@ -64,18 +60,55 @@ export const createStudent = asyncHandler(
         user.password = hashedPassword;
         await user.save();
 
-        console.log("password => ", password , " email => ", student.email        )
         await sendEmail({
-            html:`
-            <div>Your login email: ${student.email}</div>
-            <div>Your login password: ${password}</div>
-                <p>please! change your password after login</p>
-                `,
-            subject: 'Login Password',
-            to: student.email,
-        });
+          to: student.email,
+          subject: 'Your Login Credentials',
+          html: `
+          <div style="background-color:#f4f6f8;padding:30px;font-family:Arial,Helvetica,sans-serif;">
+            <div style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,0.08);padding:30px;">
 
-        
+              <h2 style="color:#1f2937;text-align:center;margin-bottom:20px;">
+                Welcome to College Management System
+              </h2>
+
+              <p style="color:#374151;font-size:14px;">
+                Hello <strong>${student.fullName}</strong>,
+              </p>
+
+              <p style="color:#374151;font-size:14px;">
+                Your account has been created successfully. Below are your login details:
+              </p>
+
+              <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:15px;margin:20px 0;">
+                <p style="margin:8px 0;font-size:14px;">
+                  <strong>Email:</strong> ${student.email}
+                </p>
+                <p style="margin:8px 0;font-size:14px;">
+                  <strong>Password:</strong> ${password}
+                </p>
+              </div>
+
+              <p style="color:#dc2626;font-size:13px;">
+                Please change your password immediately after logging in for security reasons.
+              </p>
+
+              <div style="text-align:center;margin-top:25px;">
+                <a href="http://localhost:5173/login"
+                   style="background:#2563eb;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:6px;font-size:14px;display:inline-block;">
+                  Login Now
+                </a>
+              </div>
+
+              <hr style="margin:30px 0;border:none;border-top:1px solid #e5e7eb;" />
+
+              <p style="font-size:12px;color:#6b7280;text-align:center;">
+                Copyright &copy; ${new Date().getFullYear()} College Management System<br/>
+                This is an automated email. Please do not reply.
+              </p>
+            </div>
+          </div>
+          `,
+        });
 
         res.status(201).json({
             status: "success",
@@ -145,15 +178,34 @@ export const getAllStudentsList = asyncHandler(
 // Get Student By ID
 export const getStudentById = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.params;
+
+        const student = await Student.findById(id).populate('courses');
+
+        if (!student) {
+            throw new CustomError('Student not found', 404);
+        }
+
+        res.status(200).json({
+            status: 'success',
+            success: true,
+            data: student,
+            message: 'Student fetched successfully'
+        });
+    }
+);
+
+// Get Student By Email
+export const getStudentByEmail = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
         const { email } = req.params;
         
-        // 1. studentId 
+        // student email
         const student = await Student.findOne({email: email}).populate('courses').populate("classes");
         if (!student) {
             throw new CustomError('Student not found', 404);
         }
         const attendInfo = await Attendance.findOne({student: student._id})
-        // console.log("student => ", student, " email ->  ", email)
 
         res.status(200).json({
             status: 'success',
@@ -262,8 +314,6 @@ export const getStudentsByClass = asyncHandler(async (req, res) => {
     message: 'Students fetched successfully',
   });
 });
-
-
 
 // Get All by filter // class + course 
 export const getAllStudentsFilter = asyncHandler(

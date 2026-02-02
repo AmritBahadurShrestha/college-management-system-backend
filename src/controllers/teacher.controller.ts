@@ -16,7 +16,7 @@ const folder_name = '/teachers';
 export const createTeacher = asyncHandler(
 
   async (req: Request, res: Response, next: NextFunction) => {
-    // 1. Get details 
+    // Get details 
     const { fullName, email, phone, gender, department, courses, role = 'TEACHER' } = req.body;
     
     // Handle profile upload
@@ -60,19 +60,56 @@ export const createTeacher = asyncHandler(
             isnewAdded: true
         });
 
-    console.log("Teacher created successfully");
-    console.log("password => ", password, " email => ", teacher.email);
-
     // Send email with credentials
     await sendEmail({
-        html: `
-            <div>Your login email: ${teacher.email}</div>
-            <div>Your login password: ${password}</div>
-            <p>Please change your password after login</p>
-        `,
-        subject: 'Login Password',
-        to: teacher.email,
-    });
+          to: teacher.email,
+          subject: 'Your Login Credentials',
+          html: `
+          <div style="background-color:#f4f6f8;padding:30px;font-family:Arial,Helvetica,sans-serif;">
+            <div style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,0.08);padding:30px;">
+
+              <h2 style="color:#1f2937;text-align:center;margin-bottom:20px;">
+                Welcome to College Management System
+              </h2>
+
+              <p style="color:#374151;font-size:14px;">
+                Hello <strong>${teacher.fullName}</strong>,
+              </p>
+
+              <p style="color:#374151;font-size:14px;">
+                Your account has been created successfully. Below are your login details:
+              </p>
+
+              <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:15px;margin:20px 0;">
+                <p style="margin:8px 0;font-size:14px;">
+                  <strong>Email:</strong> ${teacher.email}
+                </p>
+                <p style="margin:8px 0;font-size:14px;">
+                  <strong>Password:</strong> ${password}
+                </p>
+              </div>
+
+              <p style="color:#dc2626;font-size:13px;">
+                Please change your password immediately after logging in for security reasons.
+              </p>
+
+              <div style="text-align:center;margin-top:25px;">
+                <a href="http://localhost:5173/login"
+                   style="background:#2563eb;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:6px;font-size:14px;display:inline-block;">
+                  Login Now
+                </a>
+              </div>
+
+              <hr style="margin:30px 0;border:none;border-top:1px solid #e5e7eb;" />
+
+              <p style="font-size:12px;color:#6b7280;text-align:center;">
+                Copyright &copy; ${new Date().getFullYear()} College Management System<br/>
+                This is an automated email. Please do not reply.
+              </p>
+            </div>
+          </div>
+          `,
+        });
 
     res.status(201).json({
         status: "success",
@@ -81,9 +118,6 @@ export const createTeacher = asyncHandler(
         message: "Teacher created successfully",
     });
 }
-
-
-    
 );
 
 // Get All Teachers
@@ -141,6 +175,26 @@ export const getAllTeachersList = asyncHandler(
 
 // Get Teacher By ID
 export const getTeacherById = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.params;
+
+        const teacher = await Teacher.findById(id).populate('courses');
+
+        if (!teacher) {
+            throw new CustomError('Teacher not found', 404);
+        }
+
+        res.status(200).json({
+            status: 'success',
+            success: true,
+            data: teacher,
+            message: 'Teacher fetched successfully'
+        });
+    }
+);
+
+// Get Teacher By Email
+export const getTeacherByEmail = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { email } = req.params;
 
