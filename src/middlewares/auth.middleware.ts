@@ -28,7 +28,7 @@ export const authenticate = (roles?: Role[]) => {
 
       // Check role authorization
       if (roles && !roles.includes(decodedData.role)) {
-        throw new CustomError("Role is authorized", 403);
+        throw new CustomError("Role is Unauthorized", 403);
       }
 
       // Attach user to request

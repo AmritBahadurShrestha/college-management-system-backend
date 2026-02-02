@@ -7,16 +7,16 @@ import {
   updateClass,
   deleteClass,
 } from "../controllers/class.controller";
-import { allAdminsTeachers } from "../types/global.types";
+import { onlyAdmin } from "../types/global.types";
 import { authenticate } from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
-router.post("/", authenticate(allAdminsTeachers), createClass);
+router.post("/", authenticate(onlyAdmin), createClass);
 router.get("/", getAllClasses);
 router.get("/all", getAllClassesList);
 router.get("/:id", getClassById);
-router.put("/:id", authenticate(allAdminsTeachers), updateClass);
-router.delete("/:id", authenticate(allAdminsTeachers), deleteClass);
+router.put("/:id", authenticate(onlyAdmin), updateClass);
+router.delete("/:id", authenticate(onlyAdmin), deleteClass);
 
 export default router;
