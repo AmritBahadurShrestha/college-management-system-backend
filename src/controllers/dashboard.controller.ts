@@ -1,9 +1,9 @@
-import Class from '../models/class.model';
-import Course from '../models/course.model';
-import Teacher from '../models/teacher.model';
-import Student from '../models/student.model';
-import { Request, Response, NextFunction } from 'express';
-import { asyncHandler } from '../utils/async-handler.utils';
+import Class from "../models/class.model";
+import Course from "../models/course.model";
+import Teacher from "../models/teacher.model";
+import Student from "../models/student.model";
+import { Request, Response, NextFunction } from "express";
+import { asyncHandler } from "../utils/async-handler.utils";
 
 export const getDashboard = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -13,10 +13,10 @@ export const getDashboard = asyncHandler(
     const classes = await Class.countDocuments();
 
     res.status(200).json({
-      message: 'Dashboard data retrieved successfully',
-      status: 'success',
+      message: "Dashboard data retrieved successfully",
+      status: "success",
       success: true,
-      data: { students, teachers, courses, classes }
+      data: { students, teachers, courses, classes },
     });
-  }
+  },
 );
