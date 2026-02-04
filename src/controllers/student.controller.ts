@@ -28,7 +28,7 @@ export const createStudent = asyncHandler(
         }
 
         // Creating Student Instance
-        const student = new Student({ fullName, email, phone, address, dob, gender, rollNumber, registrationNumber, program, semester,classes, courses, role  });
+        const student = new Student({ fullName, email, phone, address, dob, gender, rollNumber, registrationNumber, program, semester, classes, courses, role  });
 
         const { path, public_id } = await uploadFile(
             profile.path,
@@ -146,7 +146,7 @@ export const createStudent = asyncHandler(
             const total = await Student.countDocuments(filter);
 
             // Fetch students with pagination
-            const students = await Student.find(filter).populate('courses').sort({ createdAt: -1 }).limit(limit).skip(skip);
+            const students = await Student.find(filter).populate('courses').populate("classes").sort({ createdAt: -1 }).limit(limit).skip(skip);
 
 
             console.log(students)
@@ -180,7 +180,7 @@ export const getStudentById = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { id } = req.params;
 
-        const student = await Student.findById(id).populate('courses');
+        const student = await Student.findById(id).populate('courses').populate("classes");
 
         if (!student) {
             throw new CustomError('Student not found', 404);

@@ -57,10 +57,12 @@ const studentSchema = new mongoose.Schema(
         ref: "course",
       },
     ],
-    classes: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "class",
-    },
+    classes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "class",
+      },
+    ],
     profile: {
       path: {
         type: String,
