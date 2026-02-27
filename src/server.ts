@@ -15,6 +15,7 @@ import studentRoutes from "./routes/student.routes";
 import teacherRoutes from "./routes/teacher.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import attendanceRoutes from "./routes/attendance.routes";
+import reportRoutes from "./routes/report.routes";
 
 const PORT = process.env.PORT;
 const DATABASE_URI = process.env.DATABASE_URI ?? "";
@@ -81,6 +82,7 @@ app.use("/api/student", studentRoutes);
 app.use("/api/teacher", teacherRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/attendance", attendanceRoutes);
+app.use("/api/report", reportRoutes);
 
 // 404 Handler for routes that don't exist
 app.use((req: Request, res: Response, next: NextFunction) => {
