@@ -1,10 +1,10 @@
-import Class from "../models/class.model";
-import { Request, Response, NextFunction } from "express";
-import { getPagination } from "../utils/pagination.utils";
-import { asyncHandler } from "../utils/async-handler.utils";
+import { NextFunction, Request, Response } from "express";
 import CustomError from "../middlewares/error-handler.middleware";
+import Class from "../models/class.model";
 import Student from "../models/student.model";
 import Teacher from "../models/teacher.model";
+import { asyncHandler } from "../utils/async-handler.utils";
+import { getPagination } from "../utils/pagination.utils";
 
 // Create Class
 export const createClass = asyncHandler(
@@ -23,13 +23,13 @@ export const createClass = asyncHandler(
 );
 
 // get all student based class 
-export const addStudentClass = asyncHandler(
+export const getAllStuClass = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     
     // 1. details req
-    const { className} = req?.body;  
+    const  className = req?.params?.className;   
 
-      const classInfo = await Class.findOne({"name": className})
+      const classInfo = await Class.findOne({_id: className})
       if(!classInfo) throw new Error("class is not Found ")
       
       
@@ -45,26 +45,39 @@ export const addStudentClass = asyncHandler(
   },
 );
 
-// get all teacher based class 
-export const geTeacherClass = asyncHandler(
+export const getTeaClass = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
+    // 1. Get class name from body
+    const  className = req?.params?.className;   
+
+    // 2. Get all classes matching the name
+    const classInfo = await Class.find({ _id: className });
+
+    // Handle case where no classes are found
+    if (!classInfo || classInfo.length === 0) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+
+    console.log("Class info => ", classInfo);
+
+    // 3. Resolve all teacher queries in parallel using Promise.all
     
-    // 1. details req
-    const { className} = req?.body;  
+    const teacherPromises = classInfo.map((singleClass) =>
+      Teacher.find({ courses: { $in: singleClass.courses } })
+    );
 
-      const classInfo = await Class.findOne({"name": className})
-      if(!classInfo) throw new Error("class is not Found ")
-      
-      
-      const teacherList = await Teacher.find({ classes: classInfo._id });
+    const teacherResults = await Promise.all(teacherPromises);
 
-    res.status(201).json({
+    // 4. Flatten the results (since Promise.all returns an array of arrays)
+    const flatTeacherList = teacherResults.flat();
+
+    res.status(200).json({
       status: "success",
       success: true,
-      data: teacherList,
-      message: "all Teacher based class ",
+      data: flatTeacherList,
+      message: "All teachers retrieved for the specified classes",
     });
-  },
+  }
 );
 
 
