@@ -22,59 +22,130 @@ export const createClass = asyncHandler(
   },
 );
 
+// // get all student based class 
+// export const getAllStuClass = asyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+    
+//     // 1. details req
+//     const  className = req?.params?.className;   
+
+//       const classInfo = await Class.findOne({_id: className})
+//       if(!classInfo) throw new Error("class is not Found ")
+      
+//       const stuList = await Student.find({ classes: classInfo._id }).populate('courses');
+
+//     res.status(201).json({
+//       status: "success",
+//       success: true,
+//       data: stuList,
+//       message: "all Student based class ",
+//     });
+//   },
+// );
+
+// // get all teacher based class 
+// export const getTeaClass = asyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     // 1. Get class name from body
+//     const  className = req?.params?.className;   
+
+//     // 2. Get all classes matching the name
+//     const classInfo = await Class.find({ _id: className }).populate('courses');
+
+//     // Handle case where no classes are found
+//     if (!classInfo || classInfo.length === 0) {
+//       return res.status(404).json({ message: "Class not found" });
+//     }
+
+//     console.log("Class info => ", classInfo);
+
+//     // 3. Resolve all teacher queries in parallel using Promise.all
+    
+//     const teacherPromises = classInfo.map((singleClass) =>
+//       Teacher.find({ courses: { $in: singleClass.courses } })
+//       .populate('courses')
+//     );
+
+//     const teacherResults = await Promise.all(teacherPromises);
+
+//     // 4. Flatten the results (since Promise.all returns an array of arrays)
+//     const flatTeacherList = teacherResults.flat();
+
+//     res.status(200).json({
+//       status: "success",
+//       success: true,
+//       data: flatTeacherList,
+//       message: "All teachers retrieved for the specified classes",
+//     });
+//   }
+// );
+
+
 // get all student based class 
 export const getAllStuClass = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     
-    // 1. details req
-    const  className = req?.params?.className;   
+    const className = req?.params?.className;   
 
-      const classInfo = await Class.findOne({_id: className})
-      if(!classInfo) throw new Error("class is not Found ")
-      
-      
-      const stuList = await Student.find({ classes: classInfo._id });
-       
+    const classInfo = await Class.findOne({_id: className})
+    if(!classInfo) throw new Error("class is not Found ")
+    
+    // ✅ Pagination added
+    const page = Number(req.query.current_page) || 1;
+    const limit = Number(req.query.per_page) || 5;
+    const skip = (page - 1) * limit;
+
+    const total = await Student.countDocuments({ classes: classInfo._id });
+    const stuList = await Student.find({ classes: classInfo._id })
+      .populate('courses')
+      .limit(limit)
+      .skip(skip);
 
     res.status(201).json({
       status: "success",
       success: true,
       data: stuList,
+      pagination: getPagination(total, page, limit), // ✅
       message: "all Student based class ",
     });
   },
 );
 
+// get all teacher based class 
 export const getTeaClass = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    // 1. Get class name from body
-    const  className = req?.params?.className;   
+    const className = req?.params?.className;   
 
-    // 2. Get all classes matching the name
-    const classInfo = await Class.find({ _id: className });
+    const classInfo = await Class.find({ _id: className }).populate('courses');
 
-    // Handle case where no classes are found
     if (!classInfo || classInfo.length === 0) {
       return res.status(404).json({ message: "Class not found" });
     }
 
     console.log("Class info => ", classInfo);
 
-    // 3. Resolve all teacher queries in parallel using Promise.all
-    
+    // ✅ Pagination added
+    const page = Number(req.query.current_page) || 1;
+    const limit = Number(req.query.per_page) || 5;
+    const skip = (page - 1) * limit;
+
     const teacherPromises = classInfo.map((singleClass) =>
       Teacher.find({ courses: { $in: singleClass.courses } })
+      .populate('courses')
     );
 
     const teacherResults = await Promise.all(teacherPromises);
-
-    // 4. Flatten the results (since Promise.all returns an array of arrays)
     const flatTeacherList = teacherResults.flat();
+
+    // ✅ Paginate after flattening
+    const total = flatTeacherList.length;
+    const paginatedTeachers = flatTeacherList.slice(skip, skip + limit);
 
     res.status(200).json({
       status: "success",
       success: true,
-      data: flatTeacherList,
+      data: paginatedTeachers, // ✅
+      pagination: getPagination(total, page, limit), // ✅
       message: "All teachers retrieved for the specified classes",
     });
   }
