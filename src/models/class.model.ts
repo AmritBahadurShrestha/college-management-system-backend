@@ -17,22 +17,12 @@ const classSchema = new mongoose.Schema(
       max: 8,
       required: true,
     },
-    students: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "student",
-      },
-    ],
     courses: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "course",
       },
     ],
-    teacher: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "teacher",
-    },
     isActive: {
       type: Boolean,
       default: true,

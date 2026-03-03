@@ -3,6 +3,8 @@ import { Request, Response, NextFunction } from "express";
 import { getPagination } from "../utils/pagination.utils";
 import { asyncHandler } from "../utils/async-handler.utils";
 import CustomError from "../middlewares/error-handler.middleware";
+import Student from "../models/student.model";
+import Teacher from "../models/teacher.model";
 
 // Create Class
 export const createClass = asyncHandler(
@@ -19,6 +21,53 @@ export const createClass = asyncHandler(
     });
   },
 );
+
+// get all student based class 
+export const addStudentClass = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    
+    // 1. details req
+    const { className} = req?.body;  
+
+      const classInfo = await Class.findOne({"name": className})
+      if(!classInfo) throw new Error("class is not Found ")
+      
+      
+      const stuList = await Student.find({ classes: classInfo._id });
+       
+
+    res.status(201).json({
+      status: "success",
+      success: true,
+      data: stuList,
+      message: "all Student based class ",
+    });
+  },
+);
+
+// get all teacher based class 
+export const geTeacherClass = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    
+    // 1. details req
+    const { className} = req?.body;  
+
+      const classInfo = await Class.findOne({"name": className})
+      if(!classInfo) throw new Error("class is not Found ")
+      
+      
+      const teacherList = await Teacher.find({ classes: classInfo._id });
+
+    res.status(201).json({
+      status: "success",
+      success: true,
+      data: teacherList,
+      message: "all Teacher based class ",
+    });
+  },
+);
+
+
 
 // Get All Classes
 export const getAllClasses = asyncHandler(
@@ -46,7 +95,7 @@ export const getAllClasses = asyncHandler(
 
     // Fetch classes with pagination
     const Classes = await Class.find(filter)
-      .populate("students courses teacher")
+      .populate("courses")
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip(skip);
@@ -65,7 +114,7 @@ export const getAllClasses = asyncHandler(
 export const getAllClassesList = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const Classes = await Class.find()
-      .populate("students courses teacher")
+      .populate("courses")
       .sort({ name: 1 });
 
     res.status(200).json({
@@ -83,7 +132,7 @@ export const getClassById = asyncHandler(
     const { id } = req.params;
 
     const classObj = await Class.findById(id).populate(
-      "students courses teacher",
+      "courses",
     );
 
     if (!classObj) {
@@ -109,7 +158,7 @@ export const updateClass = asyncHandler(
       id,
       { $set: payload },
       { new: true, runValidators: true },
-    ).populate("students courses teacher");
+    ).populate("courses");
 
     if (!updatedClass) {
       throw new CustomError("Class not found", 404);

@@ -6,6 +6,7 @@ import {
   getClassById,
   updateClass,
   deleteClass,
+  addStudentClass,
 } from "../controllers/class.controller";
 import { onlyAdmin } from "../types/global.types";
 import { authenticate } from "../middlewares/auth.middleware";
@@ -13,6 +14,7 @@ import { authenticate } from "../middlewares/auth.middleware";
 const router = express.Router();
 
 router.post("/", authenticate(onlyAdmin), createClass);
+router.post("/addclass", addStudentClass);
 router.get("/", getAllClasses);
 router.get("/all", getAllClassesList);
 router.get("/:id", getClassById);

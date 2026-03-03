@@ -5,6 +5,8 @@ import { asyncHandler } from "../utils/async-handler.utils";
 import { generateToken, verifyToken } from "../utils/jwt.utils";
 import CustomError from "../middlewares/error-handler.middleware";
 import { compareHash, hashPassword } from "../utils/bcrypt.utils";
+import { generatePassword } from "../utils/PasswordGenerator.utils";
+import { sendEmail } from "../utils/nodemailer.utils";
 
 // Register User
 export const register = asyncHandler(
@@ -119,8 +121,6 @@ export const changePassword = asyncHandler(
     // check if email ready
     const user = await User.findOne({ email: userInfo?.email });
     if (!user) throw new CustomError("User not found", 400);
-    // console.log("user => ", user)
-
     // new password bcrypt hash
     const isPassMatched = compareHash(old_password, user.password);
     if (!isPassMatched) {
@@ -189,6 +189,78 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
       message: "Logout successful",
     });
 });
+
+// Forgot Password
+export const forgotPassword = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body;
+
+    if (!email) {
+      throw new CustomError("Email is required", 400);
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new CustomError("No account found with this email", 404);
+    }
+
+    const newPassword = generatePassword(12);
+    const hashedPassword = await hashPassword(newPassword);
+
+    user.password = hashedPassword;
+    user.isnewAdded = true;
+    await user.save();
+
+    await sendEmail({
+      to: email,
+      subject: "Password Reset - College Management System",
+      html: `
+      <div style="background-color:#f4f6f8;padding:30px;font-family:Arial,Helvetica,sans-serif;">
+        <div style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,0.08);padding:30px;">
+          <h2 style="color:#1f2937;text-align:center;margin-bottom:20px;">
+            Password Reset
+          </h2>
+          <p style="color:#374151;font-size:14px;">
+            Hello <strong>${user.fullName}</strong>,
+          </p>
+          <p style="color:#374151;font-size:14px;">
+            Your password has been reset. Below is your new temporary password:
+          </p>
+          <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:15px;margin:20px 0;">
+            <p style="margin:8px 0;font-size:14px;">
+              <strong>Email:</strong> ${email}
+            </p>
+            <p style="margin:8px 0;font-size:14px;">
+              <strong>New Password:</strong> ${newPassword}
+            </p>
+          </div>
+          <p style="color:#dc2626;font-size:13px;">
+            Please change your password immediately after logging in for security reasons.
+          </p>
+          <div style="text-align:center;margin-top:25px;">
+            <a href="http://localhost:5173/login"
+               style="background:#2563eb;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:6px;font-size:14px;display:inline-block;">
+              Login Now
+            </a>
+          </div>
+          <hr style="margin:30px 0;border:none;border-top:1px solid #e5e7eb;" />
+          <p style="font-size:12px;color:#6b7280;text-align:center;">
+            Copyright &copy; ${new Date().getFullYear()} College Management System<br/>
+            This is an automated email. Please do not reply.
+          </p>
+        </div>
+      </div>
+      `,
+    });
+
+    res.status(200).json({
+      status: "success",
+      success: true,
+      data: null,
+      message: "A new password has been sent to your email",
+    });
+  },
+);
 
 // Change Role
 export const changeRole = asyncHandler(async (req: Request, res: Response) => {

@@ -5,6 +5,8 @@ import {
   getAllStudents,
   getAllStudentsFilter,
   getAllStudentsList,
+  getNextRegistrationNumber,
+  getNextRollNumber,
   getStudentByEmail,
   getStudentById,
   getStudents,
@@ -28,6 +30,8 @@ router.post(
 router.get("/", getAllStudents);
 router.get("/all", getAllStudentsList);
 router.get("/chart", getStudents);
+router.get("/next-roll-number", getNextRollNumber);
+router.get("/next-registration-number", getNextRegistrationNumber);
 router.get("/class/:classId", getStudentsByClass);
 router.post("/filter", getAllStudentsFilter);
 router.get("/email/:email", getStudentByEmail);

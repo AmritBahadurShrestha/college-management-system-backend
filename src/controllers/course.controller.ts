@@ -119,6 +119,29 @@ export const updateCourse = asyncHandler(
   },
 );
 
+// Get Courses By Program and Semester
+export const getCoursesByProgramSemester = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { program, semester } = req.query;
+
+    if (!program || !semester) {
+      throw new CustomError("Program and semester are required", 400);
+    }
+
+    const courses = await Course.find({
+      program: program as string,
+      semester: Number(semester),
+    }).sort({ name: 1 });
+
+    res.status(200).json({
+      status: "success",
+      success: true,
+      data: courses,
+      message: "Courses fetched by program and semester successfully",
+    });
+  },
+);
+
 // Delete Course
 export const deleteCourse = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {

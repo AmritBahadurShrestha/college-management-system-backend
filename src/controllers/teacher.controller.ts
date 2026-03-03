@@ -131,6 +131,7 @@ export const getAllTeachers = asyncHandler(
         const skip = (page - 1) * limit;
 
         const searchQuery = typeof query === 'string'? query:''
+        const departmentFilter = typeof req.query.department === 'string' ? req.query.department : ''
 
         let filter:any = {}
 
@@ -140,6 +141,10 @@ export const getAllTeachers = asyncHandler(
                     fullName: { $regex: searchQuery, $options: 'i' }
                 }
             ]
+        }
+
+        if (departmentFilter) {
+            filter.department = departmentFilter
         }
 
         // Total number of teachers

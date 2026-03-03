@@ -9,7 +9,6 @@ export const authenticate = (roles?: Role[]) => {
     try {
       // Get token from header
       const access_token = req.headers["x-access-token"];
-      console.log("Raw token from header:", access_token);
 
       // Validate token exists
       if (!access_token || typeof access_token !== "string") {

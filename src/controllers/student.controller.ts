@@ -131,6 +131,8 @@ export const createStudent = asyncHandler(
             const skip = (page - 1) * limit;
 
             const searchQuery = typeof query === 'string'? query:''
+            const programFilter = typeof req.query.program === 'string' ? req.query.program : ''
+            const semesterFilter = req.query.semester ? Number(req.query.semester) : 0
 
             let filter:any={}
 
@@ -142,6 +144,14 @@ export const createStudent = asyncHandler(
                 ]
             }
 
+            if (programFilter) {
+                filter.program = programFilter
+            }
+
+            if (semesterFilter) {
+                filter.semester = semesterFilter
+            }
+
             // Total number of students
             const total = await Student.countDocuments(filter);
 
@@ -149,7 +159,6 @@ export const createStudent = asyncHandler(
             const students = await Student.find(filter).populate('courses').populate("classes").sort({ createdAt: -1 }).limit(limit).skip(skip);
 
 
-            console.log(students)
             res.status(200).json({
                 status: 'success',
                 success: true,
@@ -290,6 +299,110 @@ export const deleteStudent = asyncHandler(
     }
 );
 
+// Get Next Roll Number
+export const getNextRollNumber = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+
+        const result = await Student.aggregate([
+            {
+                $match: {
+                    rollNumber: /^\d{8}$/ // only match valid 8-digit roll numbers
+                }
+            },
+            {
+                $addFields: {
+                    rollNumberInt: { $toLong: "$rollNumber" }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    maxRollNumber: { $max: "$rollNumberInt" }
+                }
+            }
+        ]);
+
+        let nextRollNumber: string;
+
+        if (result.length > 0 && result[0].maxRollNumber) {
+            const nextNumber = Number(result[0].maxRollNumber) + 1;
+
+            // Ensure it never exceeds 8 digits (max: 99999999)
+            if (nextNumber > 99999999) {
+                res.status(400).json({
+                    status: 'error',
+                    success: false,
+                    data: null,
+                    message: 'Roll number limit reached (max 8 digits)'
+                });
+                return;
+            }
+
+            nextRollNumber = String(nextNumber).padStart(8, '0');
+        } else {
+            nextRollNumber = '21126100'; // first roll number if no students exist
+        }
+
+        res.status(200).json({
+            status: 'success',
+            success: true,
+            data: nextRollNumber,
+            message: 'Next roll number generated successfully'
+        });
+    }
+);
+
+// Get Next Registration Number
+export const getNextRegistrationNumber = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+
+    const datePrefix = `${year}-${month}-${day}`;
+
+    // Get global max serial across ALL dates
+    const result = await Student.aggregate([
+      {
+        $match: {
+          registrationNumber: /^\d{4}-\d{1,2}-\d{1,2}-\d+$/
+        }
+      },
+      {
+        $addFields: {
+          serialInt: {
+            $toLong: {
+              $arrayElemAt: [{ $split: ["$registrationNumber", "-"] }, -1]
+            }
+          }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          maxSerial: { $max: "$serialInt" }
+        }
+      }
+    ]);
+
+    let nextSerial = 1;
+
+    if (result.length > 0 && result[0].maxSerial) {
+      nextSerial = Number(result[0].maxSerial) + 1;
+    }
+
+    const nextRegistrationNumber = `${datePrefix}-${String(nextSerial).padStart(4, '0')}`;
+
+    res.status(200).json({
+      status: 'success',
+      success: true,
+      data: nextRegistrationNumber,
+      message: 'Next registration number generated successfully',
+    });
+  }
+);
+
 // Get Students For Chart
 export const getStudents = asyncHandler(async (req, res) => {
 
@@ -319,7 +432,6 @@ export const getStudentsByClass = asyncHandler(async (req, res) => {
 export const getAllStudentsFilter = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { current_page, per_page } = req.query;
-        // console.log("body => ", req?.body)
         const { class: className, course } = req.body ;
         
         const page = Number(current_page) || 1;
@@ -349,8 +461,6 @@ export const getAllStudentsFilter = asyncHandler(
             .limit(limit)
             .skip(skip);
 
-        console.log(students);
-        
         res.status(200).json({
             status: 'success',
             success: true,
