@@ -24,3 +24,15 @@ export enum Program {
 }
 
 export const SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
+
+export enum ResultStatus {
+  PASS = "PASS",
+  FAIL = "FAIL",
+  ABSENT = "ABSENT",
+  WITHHELD = "WITHHELD",
+}
+
+export enum ExamType {
+  REGULAR = "REGULAR",
+  BACK = "BACK",
+}
