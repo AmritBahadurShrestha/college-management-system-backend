@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { ExamType, ResultStatus } from "../types/enum.types";
+import { ResultStatus } from "../types/enum.types";
 
 const resultSchema = new mongoose.Schema(
   {
@@ -13,31 +13,22 @@ const resultSchema = new mongoose.Schema(
       ref: "class",
       required: true,
     },
-    courses: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "course",
-        },
+    marks: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "mark",
+      },
     ],
     program: {
       type: String,
       required: true,
-      trim: true, // e.g. "BCA", "BBA", "B.Sc. CSIT"
+      trim: true,
     },
     semester: {
       type: Number,
       required: true,
       min: 1,
       max: 8,
-    },
-    examYear: {
-      type: Number, // e.g. 2025 (year the exam was held)
-      required: true,
-    },
-    examType: {
-      type: String,
-      enum: Object.values(ExamType),
-      required: true,
     },
     cgpa: {
       type: Number,

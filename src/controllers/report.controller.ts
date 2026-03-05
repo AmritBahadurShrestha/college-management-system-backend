@@ -8,8 +8,6 @@ import { asyncHandler } from '../utils/async-handler.utils';
 import { Role } from '../types/enum.types';
 import Class from '../models/class.model';
 
-
-
 // generateReport
 export const generateReport = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -25,36 +23,58 @@ export const generateReport = asyncHandler(
 
     let reportData: any = {};
 
-    // 🔹 TEACHER REPORT
+    // TEACHER REPORT
     if (userInfo.role === Role.TEACHER) {
 
       const teacherInfo = await Teacher.findOne({ email: emailinfo })
-        .populate('courses');
+        .populate("courses");
 
-      const classInfo = await Class.find({ teacher: teacherInfo?._id });
-
+      if (!teacherInfo) {
+        throw new CustomError("Teacher not found", 404);
+      }
+    
+      const courseIds = teacherInfo.courses.map((c: any) => c._id);
+    
+      const classInfo = await Class.find({
+        courses: { $in: courseIds }
+      }).populate("courses");
+    
       const classIds = classInfo.map(cls => cls._id);
 
+      // For each class, count how many students have that class in their classes array
+      const classInfoWithStudentCount = await Promise.all(
+        classInfo.map(async (cls) => {
+          const studentCount = await Student.countDocuments({
+            classes: cls._id,
+          });
+          return {
+            ...cls.toObject(),
+            students: Array(studentCount).fill(null), // frontend uses .length
+          };
+        })
+      );
+    
       const totalStudentCount = await Student.countDocuments({
         classes: { $in: classIds }
       });
-
+    
       const totalStudent = await Student.countDocuments();
-
-      const perc = totalStudent > 0
-        ? (totalStudentCount / totalStudent) * 100
-        : 0;
-
+    
+      const perc =
+        totalStudent > 0
+          ? (totalStudentCount / totalStudent) * 100
+          : 0;
+    
       reportData = {
         role: "TEACHER",
         teacherInfo,
-        classInfo,
+        classInfo: classInfoWithStudentCount,
         totalStudentCount,
         percentage: perc,
       };
     }
 
-    // 🔹 STUDENT REPORT
+    // STUDENT REPORT
     if (userInfo.role === Role.STUDENT) {
 
       const studentInfo = await Student.findOne({ email: emailinfo })
@@ -98,4 +118,3 @@ export const generateReport = asyncHandler(
     });
   }
 );
-

@@ -1,15 +1,16 @@
 import express from "express";
-import { onlyAdmin } from "../types/global.types";
+import { createResult, deleteResult, generateClassReport, getAllResult, getAllResultsForTeacher, getMyResults, updateResult } from "../controllers/result.controller";
 import { authenticate } from "../middlewares/auth.middleware";
-import { createResult, deleteResult, generateClassReport, getAllResultsForTeacher, getOwnResults, updateResult } from "../controllers/result.controller";
+import { allAdminsTeachers, onlyStudent, onlyTeacher } from "../types/global.types";
 
 const router = express.Router();
 
 router.post("/", createResult); //Admin
-router.get("/", getAllResultsForTeacher); //Teacher
-router.get("/class/:classId/report", generateClassReport); //Teacher
 router.patch("/:id", updateResult); //Admin
 router.delete("/:id", deleteResult); //Admin
-router.get("/student/results", getOwnResults); //Student
+router.get("/", getAllResult);
+router.get("/my",authenticate(onlyStudent), getMyResults); //Student
+router.get("/student/:id", authenticate(onlyTeacher), getAllResultsForTeacher); //Teacher
+router.get("/class/:classId", authenticate(allAdminsTeachers), generateClassReport); //Admin Teacher
 
 export default router;
