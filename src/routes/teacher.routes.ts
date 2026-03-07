@@ -7,6 +7,7 @@ import {
   getTeacherByEmail,
   getTeacherById,
   updateTeacher,
+  updateTeacherSelf,
 } from "../controllers/teacher.controller";
 import { onlyAdmin } from "../types/global.types";
 import { authenticate } from "../middlewares/auth.middleware";
@@ -25,6 +26,7 @@ router.post(
 router.get("/", getAllTeachers);
 router.get("/all", getAllTeachersList);
 router.get("/email/:email", getTeacherByEmail);
+router.put('/self/:email', upload.single('profile'), updateTeacherSelf);
 router.get("/:id", getTeacherById);
 router.put(
   "/:id",

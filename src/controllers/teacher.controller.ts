@@ -291,3 +291,51 @@ export const deleteTeacher = asyncHandler(
         });
     }
 );
+
+const teacher_folder = '/teachers'; // same as your existing folder_name for teachers
+
+export const updateTeacherSelf = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+
+        const email = decodeURIComponent(req.params.email);
+        const { phone, password } = req.body;          // no address for teacher
+
+        const teacher = await Teacher.findOne({ email }); // Teacher instead of Student
+        if (!teacher) {
+            throw new CustomError('Teacher not found', 404);
+        }
+
+        const updateData: Record<string, any> = {};
+        if (phone) updateData.phone = phone;
+
+        if (password && password.trim() !== '') {
+            const hashed = await hashPassword(password);
+            await User.findOneAndUpdate(
+                { email },
+                { $set: { password: hashed, isnewAdded: false } }
+            );
+        }
+
+        const profile = req.file as Express.Multer.File;
+        if (profile) {
+            if (teacher.profile?.public_id) {
+                await deleteFiles([teacher.profile.public_id]);
+            }
+            const { path, public_id } = await uploadFile(profile.path, teacher_folder);
+            updateData.profile = { path, public_id };
+        }
+
+        const updated = await Teacher.findOneAndUpdate(
+            { email },
+            { $set: updateData },
+            { new: true }
+        ).populate('courses');                          // no classes for teacher
+
+        res.status(200).json({
+            status: 'success',
+            success: true,
+            data: updated,
+            message: 'Profile updated successfully',
+        });
+    }
+);

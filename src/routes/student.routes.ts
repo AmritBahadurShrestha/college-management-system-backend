@@ -12,6 +12,7 @@ import {
   getStudents,
   getStudentsByClass,
   updateStudent,
+  updateStudentSelf,
 } from "../controllers/student.controller";
 import { onlyAdmin } from "../types/global.types";
 import { authenticate } from "../middlewares/auth.middleware";
@@ -35,6 +36,11 @@ router.get("/next-registration-number", getNextRegistrationNumber);
 router.get("/class/:classId", getStudentsByClass);
 router.post("/filter", getAllStudentsFilter);
 router.get("/email/:email", getStudentByEmail);
+router.put(
+    '/self/:email',        // only the student themselves
+    upload.single('profile'),
+    updateStudentSelf
+);
 router.get("/:id", getStudentById);
 router.put(
   "/:id",
