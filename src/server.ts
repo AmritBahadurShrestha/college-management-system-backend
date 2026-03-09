@@ -28,6 +28,8 @@ const allowed_origins = [
   process.env.FRONT_END_LIVE_URL,
 ].filter(Boolean);
 
+console.log("Allowed origins:", allowed_origins);
+
 // Connect DataBase
 connectDatabase(DATABASE_URI);
 
@@ -58,7 +60,13 @@ app.use(
   }),
 );
 
-app.use(helmet());
+// app.use(helmet());
+
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }),
+);
 
 // Use Cookie Parser
 app.use(cookieParser());
