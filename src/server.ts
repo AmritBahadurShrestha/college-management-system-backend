@@ -26,7 +26,7 @@ const app = express();
 const allowed_origins = [
   process.env.FRONT_END_LOCAL_URL,
   process.env.FRONT_END_LIVE_URL,
-];
+].filter(Boolean);
 
 // Connect DataBase
 connectDatabase(DATABASE_URI);
